@@ -1,0 +1,64 @@
+{
+  "name": "HA Room Card",
+  "description": "Custom room card with modern design and Home Assistant 2025.12 features",
+  "version": "1.0.0",
+  "homeassistant_version": "2025.12.0",
+  "category": "dashboard",
+  "repository_type": "plugin",
+  "files": {
+    "main": "dist/ha-room-card.js",
+    "source_map": "dist/ha-room-card.js.map"
+  },
+  "requirements": {
+    "structure": {
+      "has_dist_directory": true,
+      "has_main_js_file": true,
+      "has_source_map": true,
+      "has_hacs_config": true,
+      "has_readme": true,
+      "has_license": true,
+      "has_changelog": true
+    },
+    "compatibility": {
+      "homeassistant_min": "2025.12.0",
+      "themes_support": true,
+      "sections_view": true,
+      "accessibility": "WCAG 2.1",
+      "responsive": true,
+      "animations": "cubic-bezier",
+      "reduced_motion": true
+    },
+    "features": {
+      "dynamic_themes": true,
+      "grid_options": true,
+      "card_size": true,
+      "keyboard_navigation": true,
+      "screen_reader": true,
+      "focus_management": true,
+      "theme_integration": true
+    }
+  },
+  "installation": {
+    "hacs": {
+      "category": "dashboard",
+      "repository_name": "ha-room-card",
+      "card_type": "ha-room-card"
+    },
+    "manual": {
+      "www_directory": "config/www",
+      "resource_type": "module"
+    }
+  },
+  "documentation": {
+    "readme": true,
+    "examples": true,
+    "changelog": true,
+    "api_reference": false
+  },
+  "testing": {
+    "build_status": "passed",
+    "typescript_strict": true,
+    "linting": "passed",
+    "accessibility": "WCAG 2.1 compliant"
+  }
+}
