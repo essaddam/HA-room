@@ -1,0 +1,72 @@
+# Exemple de configuration pour HA Room Card
+# Copiez ce code dans votre configuration Lovelace
+
+# Carte principale du salon
+type: custom:ha-room-card
+name: "Salon"
+icon: "mdi:sofa"
+icon_color: "blue"
+bg_start: "#1e3a5f"
+bg_end: "#2d5a87"
+
+# Capteurs climatiques
+temp_entity: "sensor.temperature_salon"
+hum_entity: "sensor.humidity_salon"
+
+# Chips supplémentaires (CO2, qualité de l'air, etc.)
+extra_chips:
+  - type: "template"
+    icon: "mdi:air-filter"
+    icon_color: "cyan"
+    content: "{{ states('sensor.co2_salon') }} ppm"
+    tap_action:
+      action: "more-info"
+      entity: "sensor.co2_salon"
+
+# Listes d'entités pour les calculs
+power_list:
+  - "sensor.tv_power"
+  - "sensor.console_power" 
+  - "sensor.lampe_chevet_power"
+
+light_list:
+  - "light.salon_principal"
+  - "light.salon_ambiance" 
+  - "light.lamonpe"
+  - "light.lampe_chevet"
+
+presence_list:
+  - "binary_sensor.mouvement_salon"
+  - "binary_sensor.presence_salon"
+
+open_list:
+  - "binary_sensor.porte_entree"
+  - "binary_sensor.fenetre_gauche"
+  - "binary_sensor.fenetre_droite"
+
+# Navigation vers les popups
+lights_hash: "#lights-salon"
+plugs_hash: "#plugs-salon"
+covers_hash: "#covers-salon"
+presence_hash: "#presence-salon"
+open_hash: "#openings-salon"
+audio_hash: "#audio-salon"
+video_hash: "#video-salon"
+cameras_hash: "#cameras-salon"
+
+# Entités médias pour les pochettes d'album
+audio_cover_entity: "media_player.salon"
+video_cover_entity: "media_player.tv_salon"
+
+# Personnalisation des labels
+covers_label: "Volets roulants"
+
+# Actions au clic sur la carte
+tap_action:
+  action: "navigate"
+  navigation_path: "/lovelace/salon"
+
+# Action maintenu (optionnel)
+hold_action:
+  action: "more-info"
+  entity: "sensor.temperature_salon"

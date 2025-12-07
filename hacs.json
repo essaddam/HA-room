@@ -1,0 +1,15 @@
+{
+  "name": "HA Room Card",
+  "render_readme": true,
+  "zip_release": true,
+  "filename": "ha-room-card.js",
+  "files": [
+    "dist/ha-room-card.js",
+    "dist/ha-room-card.js.map"
+  ],
+  "homeassistant": "2023.9.0",
+  "persistent_directory": false,
+  "country": ["FR"],
+  "domains": ["lovelace"],
+  "homeassistant_version": "2023.9.0"
+}
