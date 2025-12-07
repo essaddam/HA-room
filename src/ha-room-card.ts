@@ -28,7 +28,7 @@ console.info(
   description: 'Custom room card with modern design and interactive features',
   preview: true,
   documentationURL: 'https://github.com/yourusername/ha-room-card#readme',
-  schemaURL: '/local/community/ha-room-card/ha-room-card-schema.json',
+  schemaURL: '/hacsfiles/ha-room-card/ha-room-card-schema.json',
 });
 
 @customElement(CARD_NAME)
