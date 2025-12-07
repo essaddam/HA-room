@@ -1,16 +1,21 @@
 {
   "name": "ha-room-card",
-  "version": "1.0.0",
+  "version": "1.21.0",
   "description": "Custom room card for Home Assistant with modern design and interactive features",
   "type": "module",
-  "main": "src/ha-room-card.ts",
-  "module": "src/ha-room-card.ts",
-  "types": "src/ha-room-card.ts",
+  "main": "dist/ha-room-card.js",
+  "module": "dist/ha-room-card.js",
+  "types": "dist/ha-room-card.d.ts",
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
     "lint": "eslint src --ext .ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "pre-commit": "node scripts/pre-commit-build.js",
+    "build-and-commit": "npm run build && git add dist/ && git commit -m '🚀 Update dist files'",
+    "version": "node scripts/auto-version.js",
+    "version-tag": "node scripts/auto-version.js --tag",
+    "release": "npm run version-tag && npm run build && git push && git push --tags"
   },
   "keywords": [
     "home-assistant",
@@ -25,7 +30,6 @@
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.5",
-    
     "@typescript-eslint/eslint-plugin": "^6.7.4",
     "@typescript-eslint/parser": "^6.7.4",
     "eslint": "^8.50.0",
