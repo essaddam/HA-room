@@ -179,12 +179,14 @@ La card inclut des popups interactifs pour chaque catégorie :
 
 ## Compatibilité
 
-- ✅ Home Assistant 2025.12+
-- ✅ Navigateurs modernes (Chrome, Firefox, Safari, Edge)
-- ✅ Mobile responsive
-- ✅ Dark/Light mode
-- ✅ Accessibilité WCAG 2.1
-- ✅ Support des animations réduites
+- ✅ **Home Assistant 2025.12+** (minimum requis)
+- ✅ **Navigateurs modernes** : Chrome, Firefox, Safari, Edge, Chromium
+- ✅ **Responsive design** : Mobile-first avec breakpoints adaptatifs
+- ✅ **Thèmes dynamiques** : Clair/sombre avec variables CSS
+- ✅ **Accessibilité WCAG 2.1** : Navigation clavier, focus visible, lecteur d'écran
+- ✅ **Animations fluides** : Cubic-bezier avec support mouvement réduit
+- ✅ **Sections view** : Support natif grille flexible (getGridOptions)
+- ✅ **Performance optimisée** : Build 1.6s, tree-shaking, lazy loading
 
 ## Développement
 
