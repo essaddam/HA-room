@@ -1,0 +1,107 @@
+# Configuration avancée pour HA Room Card avec Home Assistant 2025.12
+# Ce fichier montre toutes les nouvelles fonctionnalités et améliorations
+
+# Vue principale avec support des thèmes dynamiques
+type: custom:ha-room-card
+name: "Salon Intelligent"
+icon: "mdi:home-assistant"
+icon_color: "blue"
+bg_start: "#1e3a5f"
+bg_end: "#2d5a87"
+
+# Capteurs climatiques avec affichage amélioré
+temp_entity: "sensor.temperature_salon"
+hum_entity: "sensor.humidity_salon"
+
+# Liste des entités pour monitoring
+power_list:
+  - "sensor.tv_salon_power"
+  - "sensor.console_salon_power"
+  - "sensor.lampe_chevet_power"
+
+light_list:
+  - "light.salon_principal"
+  - "light.salon_ambiance"
+  - "light.lampe_chevet"
+
+presence_list:
+  - "binary_sensor.mouvement_salon"
+  - "binary_sensor.presence_salon"
+
+open_list:
+  - "binary_sensor.porte_entree"
+  - "binary_sensor.fenetre_gauche"
+  - "binary_sensor.fenetre_droite"
+
+# Navigation vers les popups (Sections view)
+lights_hash: "#lights-salon"
+plugs_hash: "#plugs-salon"
+covers_hash: "#covers-salon"
+presence_hash: "#presence-salon"
+open_hash: "#openings-salon"
+audio_hash: "#audio-salon"
+video_hash: "#video-salon"
+cameras_hash: "#cameras-salon"
+
+# Entités médias avec pochettes d'album dynamiques
+audio_cover_entity: "media_player.salon"
+video_cover_entity: "media_player.tv_salon"
+covers_label: "Volets roulants"
+
+# Chips supplémentaires avec nouvelles fonctionnalités
+extra_chips:
+  - type: "template"
+    icon: "mdi:air-filter"
+    icon_color: "cyan"
+    content: "{{ states('sensor.co2_salon') }} ppm"
+    tap_action:
+      action: "more-info"
+      entity: "sensor.co2_salon"
+  - type: "template"
+    icon: "mdi:air-purifier"
+    icon_color: "green"
+    content: "{{ states('sensor.qualite_air') }}"
+    tap_action:
+      action: "more-info"
+      entity: "sensor.qualite_air"
+
+# Actions avec support des nouvelles transitions
+tap_action:
+  action: "navigate"
+  navigation_path: "/lovelace/salon-detail"
+
+# Action maintenu pour menu contextuel
+hold_action:
+  action: "more-info"
+  entity: "sensor.temperature_salon"
+
+# Double-clic pour action rapide
+double_tap_action:
+  action: "call-service"
+  service: "scene.turn_on"
+  service_data:
+    entity_id: "scene.salon_confort"
+
+# Features optionnelles pour Home Assistant 2025.12
+features:
+  - "full_card_actions"      # Active les actions sur toute la card
+  - "enhanced_animations"   # Animations fluides avec cubic-bezier
+  - "accessibility_mode"     # Mode accessibilité amélioré
+  - "theme_integration"     # Intégration complète des thèmes
+  - "reduced_motion"       # Support du mouvement réduit
+
+# Configuration de la grille pour Sections view
+grid_options:
+  rows: 4
+  columns: 6
+  min_rows: 3
+  max_rows: 5
+
+# Styles conditionnels selon le thème
+card_styles:
+  dark_mode:
+    border_radius: "16px"
+    shadow: "0 4px 12px rgba(0,0,0,0.3)"
+  light_mode:
+    border_radius: "20px"
+    shadow: "0 8px 16px rgba(0,0,0,0.1)"

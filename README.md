@@ -16,14 +16,57 @@ Une custom card pour Home Assistant avec design moderne et fonctionnalités inte
 
 ## Installation
 
-### Méthode 1: HACS (Recommandé)
+### Méthode 1:### Via HACS (Recommandé) 🚀
+
+[![HACS Install](https://img.shields.io/badge/HACS-Install-blue?style=flat-square)](https://hacs.xyz/docs/publish/start)
 
 1. Allez dans **HACS** > **Frontend**
 2. Cliquez sur **"Explore & Download Repositories"**
-3. Cherchez **"HA Room Card"** ou ajoutez l'URL du repository
-4. Cliquez sur **"Download"**
-5. Redémarrez Home Assistant
-6. Ajoutez la card à votre dashboard
+3. Cherchez **"HA Room Card"** ou ajoutez l'URL : `https://github.com/votre-username/ha-room-card`
+4. Cliquez sur **"Download"** ⬇️
+5. Redémarrez Home Assistant 🔄
+6. Ajoutez la card à votre dashboard ➕
+
+**Installation rapide :**
+```yaml
+# Dans configuration.yaml
+lovelace:
+  mode: yaml
+  resources:
+    - url: /hacsfiles/ha-room-card.js
+      type: module
+```
+
+### 🚀 Installation Automatique (GitHub)
+
+[![Install Direct](https://img.shields.io/badge/Install-Direct-green?style=flat-square)](https://github.com/votre-username/ha-room-card/releases)
+
+1. Téléchargez la dernière version [ici](https://github.com/votre-username/ha-room-card/releases/latest)
+2. Copiez `ha-room-card.js` dans votre dossier `config/www/`
+3. Ajoutez la ressource dans Home Assistant :
+   - **Configuration** > **Tableaux de bord** > **Ressources**
+   - URL : `/local/ha-room-card.js`
+   - Type : `Module`
+4. Redémarrez Home Assistant 🔄
+
+### 🔗 Installation Auto via Repository URL
+
+```yaml
+# Alternative : URL directe du repository
+lovelace:
+  mode: yaml
+  resources:
+    - url: https://cdn.jsdelivr.net/gh/votre-username/ha-room-card@latest/dist/ha-room-card.js
+      type: module
+```
+
+### Nouveautés Home Assistant 2025.12
+
+- 🎨 **Support des thèmes dynamiques** : Intégration automatique avec les thèmes de Home Assistant
+- 📱 **Sections view optimisé** : Support natif du nouveau système de sections avec grille flexible
+- ♿ **Accessibilité améliorée** : Support WCAG 2.1 et navigation au clavier
+- 🎭 **Animations fluides** : Nouvelles transitions cubiques-bezier et support du mouvement réduit
+- 🌓 **Mode sombre/clair** : Détection automatique du thème système
 
 ### Méthode 2: Manuelle
 
@@ -136,10 +179,12 @@ La card inclut des popups interactifs pour chaque catégorie :
 
 ## Compatibilité
 
-- ✅ Home Assistant 2023.9+
+- ✅ Home Assistant 2025.12+
 - ✅ Navigateurs modernes (Chrome, Firefox, Safari, Edge)
 - ✅ Mobile responsive
 - ✅ Dark/Light mode
+- ✅ Accessibilité WCAG 2.1
+- ✅ Support des animations réduites
 
 ## Développement
 

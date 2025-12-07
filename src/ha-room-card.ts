@@ -81,6 +81,30 @@ export class HaRoomCard extends LitElement {
         transform: translateY(-1px);
       }
 
+      /* Home Assistant 2025.12 enhanced animations */
+      .chip {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .control-button {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* Enhanced focus styles for accessibility */
+      .chip:focus,
+      .control-button:focus {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+      }
+
+      /* Reduced motion support */
+      @media (prefers-reduced-motion: reduce) {
+        .chip,
+        .control-button {
+          transition: none;
+        }
+      }
+
       .chip-icon {
         margin-right: 6px;
         font-size: 14px;
@@ -556,12 +580,19 @@ export class HaRoomCard extends LitElement {
       return html`<ha-card>Chargement...</ha-card>`;
     }
 
+    // Support for Home Assistant 2025.12 theme variables
+    const isDarkMode = this.hass.themes?.darkMode || false;
+    const primaryColor = this.hass.themes?.primaryColor || '#03a9f4';
+    const textColor = this.hass.themes?.textColor || '#ffffff';
+
     return html`
       <ha-card
-        style="--bg-start: ${this.config.bg_start}; --bg-end: ${this.config.bg_end}"
+        style="--bg-start: ${this.config.bg_start}; --bg-end: ${this.config.bg_end}; --primary-color: ${primaryColor}; --text-color: ${textColor}"
         @click=${this._handleCardAction}
         tabindex="0"
         .label=${`HA Room Card: ${this.config.name || 'Room'}`}
+        role="button"
+        aria-label=${`Room card for ${this.config.name || 'Room'}`}
       >
         <!-- Full card overlay for actions -->
         ${this.config.features?.includes('full_card_actions') 
@@ -618,5 +649,20 @@ export class HaRoomCard extends LitElement {
       presence_list: ['binary_sensor.motion'],
       open_list: ['binary_sensor.door', 'binary_sensor.window'],
     };
+  }
+
+  // Grid options for Sections view (Home Assistant 2025.12+)
+  public getGridOptions() {
+    return {
+      rows: 4,
+      columns: 6,
+      min_rows: 3,
+      max_rows: 5,
+    };
+  }
+
+  // Enhanced card size for better masonry layout
+  public getCardSize(): number {
+    return 4; // 200px height (4 * 50px)
   }
 }

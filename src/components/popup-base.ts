@@ -1,10 +1,21 @@
 import { LitElement, html, css, TemplateResult } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 
 @customElement('popup-base')
 export class PopupBase extends LitElement {
   @property({ attribute: false }) public hass!: any;
   @property({ attribute: false }) public config: any = {};
+
+  // Support for Home Assistant 2025.12 theme integration
+  @state() private isDarkMode = false;
+  @state() private primaryColor = '#03a9f4';
+
+  protected willUpdate(): void {
+    if (this.hass?.themes) {
+      this.isDarkMode = this.hass.themes.darkMode || false;
+      this.primaryColor = this.hass.themes.primaryColor || '#03a9f4';
+    }
+  }
 
   static get styles() {
     return css`
