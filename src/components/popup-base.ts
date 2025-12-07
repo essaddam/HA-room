@@ -7,14 +7,8 @@ export class PopupBase extends LitElement {
   @property({ attribute: false }) public config: any = {};
 
   // Support for Home Assistant 2025.12 theme integration
-  @state() private isDarkMode = false;
-  @state() private primaryColor = '#03a9f4';
-
   protected willUpdate(): void {
-    if (this.hass?.themes) {
-      this.isDarkMode = this.hass.themes.darkMode || false;
-      this.primaryColor = this.hass.themes.primaryColor || '#03a9f4';
-    }
+    // Theme integration handled in parent component
   }
 
   static get styles() {

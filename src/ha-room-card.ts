@@ -300,10 +300,10 @@ export class HaRoomCard extends LitElement {
 
     // Handle more-info
     if (action.action === 'more-info' && action.entity) {
-      const event = new Event('hass-more-info', {
+      const event = new CustomEvent('hass-more-info', {
         bubbles: true,
         composed: true,
-        detail: { entityId: action.entity } as any,
+        detail: { entityId: action.entity },
       });
       this.dispatchEvent(event);
       return;
@@ -340,10 +340,10 @@ export class HaRoomCard extends LitElement {
 
     // Handle more-info
     if (action.action === 'more-info' && entity) {
-      const event = new Event('hass-more-info', {
+      const event = new CustomEvent('hass-more-info', {
         bubbles: true,
         composed: true,
-        detail: { entityId: entity } as any,
+        detail: { entityId: entity },
       });
       this.dispatchEvent(event);
       return;
@@ -462,10 +462,10 @@ export class HaRoomCard extends LitElement {
 
     // Handle more-info
     if (action.action === 'more-info' && action.entity) {
-      const event = new Event('hass-more-info', {
+      const event = new CustomEvent('hass-more-info', {
         bubbles: true,
         composed: true,
-        detail: { entityId: action.entity } as any,
+        detail: { entityId: action.entity },
       });
       this.dispatchEvent(event);
       return;
@@ -581,9 +581,10 @@ export class HaRoomCard extends LitElement {
     }
 
     // Support for Home Assistant 2025.12 theme variables
-    const isDarkMode = this.hass.themes?.darkMode || false;
-    const primaryColor = this.hass.themes?.primaryColor || '#03a9f4';
-    const textColor = this.hass.themes?.textColor || '#ffffff';
+    const themes = this.hass.themes as any;
+    const isDarkMode = themes?.darkMode || false;
+    const primaryColor = themes?.primaryColor || '#03a9f4';
+    const textColor = themes?.textColor || '#ffffff';
 
     return html`
       <ha-card

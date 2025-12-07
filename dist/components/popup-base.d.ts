@@ -2,8 +2,6 @@ import { LitElement, TemplateResult } from 'lit';
 export declare class PopupBase extends LitElement {
     hass: any;
     config: any;
-    private isDarkMode;
-    private primaryColor;
     protected willUpdate(): void;
     static get styles(): import("lit").CSSResult;
     protected render(): TemplateResult;

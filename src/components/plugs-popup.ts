@@ -1,4 +1,4 @@
-import { LitElement, html, css, TemplateResult, nothing } from 'lit';
+import { html, css, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { PopupBase } from './popup-base.js';
 import { calculateEntityTotals, getFriendlyName, getIcon, isEntityOn, getNumericState, formatPower } from '../utils.js';
