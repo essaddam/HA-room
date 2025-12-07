@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Custom room card for Home Assistant with modern design and interactive features",
   "type": "module",
-  "main": "dist/ha-room-card.js",
-  "module": "dist/ha-room-card.js",
-  "types": "dist/ha-room-card.d.ts",
+  "main": "src/ha-room-card.ts",
+  "module": "src/ha-room-card.ts",
+  "types": "src/ha-room-card.ts",
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
