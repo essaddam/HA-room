@@ -34,7 +34,7 @@ Notre custom room card comprend les pages principales suivantes :
 | Room Card principale | Section caméras | Affichage des flux caméra avec snapshots |
 | Configuration popup | Paramètres card | Personnalisation des couleurs, tailles, comportements |
 | Media popup | Contrôle multimédia | Affichage des pochettes, métadonnées, contrôles avancés |
-| Éditeur visuel HA | Interface configuration | Configuration graphique complète avec validation, autocomplétion, descriptions contextuelles |
+| Éditeur visuel HA | Interface configuration | Configuration graphique complète avec validation, autocomplétion, descriptions contextuelles, sections organisées, sélecteurs d'entités, choix de couleurs, configuration des actions |
 
 ## 3. Core Process
 
@@ -50,6 +50,35 @@ Notre custom room card comprend les pages principales suivantes :
 2. Configuration complète via interface graphique (couleurs, styles, comportements)
 3. Validation automatique et autocomplétion des entités
 4. Sauvegarde des paramètres pour persistence
+
+### 2.4 Éditeur Visuel - Implémentation Technique
+
+L'éditeur visuel utilise la méthode `getConfigForm()` de Home Assistant avec les spécifications suivantes :
+
+#### Sections de configuration :
+- **Configuration de base** : Nom, icône, couleur de l'icône
+- **Apparence** : Sélecteurs de couleurs pour le dégradé de fond
+- **Capteurs** : Sélecteurs d'entités pour température et humidité
+- **Listes d'entités** : Sélection multiple avec filtres par domaine
+- **Navigation** : Configuration des hash de navigation pour popups
+- **Média** : Sélecteurs d'entités media_player
+- **Personnalisation** : Options avancées et fonctionnalités HA 2025.12+
+- **Actions** : Configuration des actions (tap, hold, double-tap)
+
+#### Sélecteurs disponibles :
+- `text` : Champs de texte simples
+- `icon` : Sélecteur d'icônes Material Design
+- `color` : Sélecteur de couleurs
+- `entity` : Sélecteur d'entités avec filtrage par domaine
+- `select` : Listes déroulantes avec options multiples
+- `action` : Sélecteur d'actions Home Assistant
+
+#### Fonctionnalités avancées :
+- Sections pliables avec icônes
+- Support des sélections multiples
+- Validation automatique des entrées
+- Autocomplétion des entités
+- Support des fonctionnalités HA 2025.12+
 
 ```mermaid
 graph TD

@@ -641,6 +641,226 @@ export class HaRoomCard extends LitElement {
     `;
   }
 
+  static getConfigForm() {
+    return {
+      schema: [
+        // Basic configuration
+        {
+          name: "name",
+          selector: { text: {} },
+        },
+        {
+          name: "icon",
+          selector: { icon: {} },
+        },
+        {
+          name: "icon_color",
+          selector: { text: {} },
+        },
+        
+        // Appearance
+        {
+          type: "expandable",
+          label: "Apparence",
+          icon: "mdi:palette",
+          schema: [
+            {
+              name: "bg_start",
+              selector: { color: {} },
+            },
+            {
+              name: "bg_end",
+              selector: { color: {} },
+            },
+          ],
+        },
+        
+        // Sensors
+        {
+          type: "expandable",
+          label: "Capteurs",
+          icon: "mdi:gauge",
+          schema: [
+            {
+              name: "temp_entity",
+              selector: { 
+                entity: { 
+                  domain: ["sensor", "climate"] 
+                } 
+              },
+            },
+            {
+              name: "hum_entity",
+              selector: { 
+                entity: { 
+                  domain: ["sensor"] 
+                } 
+              },
+            },
+          ],
+        },
+        
+        // Entity lists
+        {
+          type: "expandable",
+          label: "Listes d'entités",
+          icon: "mdi:list",
+          schema: [
+            {
+              name: "power_list",
+              selector: { 
+                entity: { 
+                  domain: ["sensor"],
+                  multiple: true
+                } 
+              },
+            },
+            {
+              name: "light_list",
+              selector: { 
+                entity: { 
+                  domain: ["light"],
+                  multiple: true
+                } 
+              },
+            },
+            {
+              name: "presence_list",
+              selector: { 
+                entity: { 
+                  domain: ["binary_sensor", "device_tracker"],
+                  multiple: true
+                } 
+              },
+            },
+            {
+              name: "open_list",
+              selector: { 
+                entity: { 
+                  domain: ["binary_sensor"],
+                  multiple: true
+                } 
+              },
+            },
+          ],
+        },
+        
+        // Navigation hashes
+        {
+          type: "expandable",
+          label: "Navigation",
+          icon: "mdi:navigation",
+          schema: [
+            {
+              name: "lights_hash",
+              selector: { text: {} },
+            },
+            {
+              name: "plugs_hash",
+              selector: { text: {} },
+            },
+            {
+              name: "covers_hash",
+              selector: { text: {} },
+            },
+            {
+              name: "presence_hash",
+              selector: { text: {} },
+            },
+            {
+              name: "open_hash",
+              selector: { text: {} },
+            },
+            {
+              name: "audio_hash",
+              selector: { text: {} },
+            },
+            {
+              name: "video_hash",
+              selector: { text: {} },
+            },
+            {
+              name: "cameras_hash",
+              selector: { text: {} },
+            },
+          ],
+        },
+        
+        // Media entities
+        {
+          type: "expandable",
+          label: "Média",
+          icon: "mdi:play-circle",
+          schema: [
+            {
+              name: "audio_cover_entity",
+              selector: { 
+                entity: { 
+                  domain: ["media_player"] 
+                } 
+              },
+            },
+            {
+              name: "video_cover_entity",
+              selector: { 
+                entity: { 
+                  domain: ["media_player"] 
+                } 
+              },
+            },
+          ],
+        },
+        
+        // Labels and customization
+        {
+          type: "expandable",
+          label: "Personnalisation",
+          icon: "mdi:cog",
+          schema: [
+            {
+              name: "covers_label",
+              selector: { text: {} },
+            },
+            {
+              name: "features",
+              selector: { 
+                select: {
+                  options: [
+                    { value: "full_card_actions", label: "Actions sur toute la carte" },
+                    { value: "enhanced_animations", label: "Animations améliorées" },
+                    { value: "adaptive_themes", label: "Thèmes adaptatifs" },
+                  ],
+                  multiple: true,
+                } 
+              },
+            },
+          ],
+        },
+        
+        // Actions
+        {
+          type: "expandable",
+          label: "Actions",
+          icon: "mdi:gesture-tap",
+          schema: [
+            {
+              name: "tap_action",
+              selector: { action: {} },
+            },
+            {
+              name: "hold_action",
+              selector: { action: {} },
+            },
+            {
+              name: "double_tap_action",
+              selector: { action: {} },
+            },
+          ],
+        },
+      ],
+    };
+  }
+
   static getStubConfig(): object {
     return {
       name: 'Salon',
