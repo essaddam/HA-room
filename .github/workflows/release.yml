@@ -30,6 +30,7 @@ jobs:
           files: |
             dist/ha-room-card.js
             dist/ha-room-card.js.map
+            dist/ha-room-card-schema.json
           generate_release_notes: true
           draft: false
           prerelease: false
