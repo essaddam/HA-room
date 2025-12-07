@@ -25,6 +25,9 @@ console.info(
   type: CARD_NAME,
   name: 'HA Room Card',
   description: 'Custom room card with modern design and interactive features',
+  preview: true,
+  documentationURL: 'https://github.com/yourusername/ha-room-card#readme',
+  schemaURL: '/local/community/ha-room-card/ha-room-card-schema.json',
 });
 
 @customElement(CARD_NAME)
@@ -582,7 +585,6 @@ export class HaRoomCard extends LitElement {
 
     // Support for Home Assistant 2025.12 theme variables
     const themes = this.hass.themes as any;
-    const isDarkMode = themes?.darkMode || false;
     const primaryColor = themes?.primaryColor || '#03a9f4';
     const textColor = themes?.textColor || '#ffffff';
 

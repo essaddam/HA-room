@@ -1,0 +1,301 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "name": "HA Room Card",
+  "description": "Custom room card with modern design and interactive features",
+  "version": "1.0.0",
+  "properties": {
+    "type": {
+      "type": "string",
+      "const": "ha-room-card",
+      "description": "Type of the card"
+    },
+    "name": {
+      "type": "string",
+      "title": "Nom de la pièce",
+      "description": "Nom affiché sur la carte",
+      "default": "Pièce",
+      "minLength": 1,
+      "maxLength": 50
+    },
+    "icon": {
+      "type": "string",
+      "title": "Icône",
+      "description": "Icône Material Design Icons (ex: mdi:home)",
+      "default": "mdi:home",
+      "pattern": "^mdi:[a-zA-Z0-9_-]+$"
+    },
+    "icon_color": {
+      "type": "string",
+      "title": "Couleur de l'icône",
+      "description": "Couleur de l'icône au format hexadécimal",
+      "default": "#ffffff",
+      "pattern": "^#[0-9a-fA-F]{6}$"
+    },
+    "bg_start": {
+      "type": "string",
+      "title": "Couleur de fond (début)",
+      "description": "Couleur de début du dégradé de fond",
+      "default": "#667eea",
+      "pattern": "^#[0-9a-fA-F]{6}$"
+    },
+    "bg_end": {
+      "type": "string",
+      "title": "Couleur de fond (fin)",
+      "description": "Couleur de fin du dégradé de fond",
+      "default": "#764ba2",
+      "pattern": "^#[0-9a-fA-F]{6}$"
+    },
+    "temp_entity": {
+      "type": "string",
+      "title": "Capteur de température",
+      "description": "Entité du capteur de température",
+      "selector": {
+        "entity": {
+          "domain": ["sensor", "climate"]
+        }
+      }
+    },
+    "hum_entity": {
+      "type": "string",
+      "title": "Capteur d'humidité",
+      "description": "Entité du capteur d'humidité",
+      "selector": {
+        "entity": {
+          "domain": ["sensor"]
+        }
+      }
+    },
+    "power_list": {
+      "type": "array",
+      "title": "Liste des capteurs de puissance",
+      "description": "Entités pour le calcul de la consommation électrique",
+      "items": {
+        "type": "string",
+        "selector": {
+          "entity": {
+            "domain": ["sensor"]
+          }
+        }
+      },
+      "default": []
+    },
+    "light_list": {
+      "type": "array",
+      "title": "Liste des lumières",
+      "description": "Entités des lumières à contrôler",
+      "items": {
+        "type": "string",
+        "selector": {
+          "entity": {
+            "domain": ["light"]
+          }
+        }
+      },
+      "default": []
+    },
+    "presence_list": {
+      "type": "array",
+      "title": "Liste des capteurs de présence",
+      "description": "Entités de détection de présence",
+      "items": {
+        "type": "string",
+        "selector": {
+          "entity": {
+            "domain": ["binary_sensor", "device_tracker"]
+          }
+        }
+      },
+      "default": []
+    },
+    "open_list": {
+      "type": "array",
+      "title": "Liste des capteurs d'ouverture",
+      "description": "Entités des portes/fenêtres",
+      "items": {
+        "type": "string",
+        "selector": {
+          "entity": {
+            "domain": ["binary_sensor"]
+          }
+        }
+      },
+      "default": []
+    },
+    "lights_hash": {
+      "type": "string",
+      "title": "Hash de navigation lumières",
+      "description": "Identifiant pour le popup des lumières",
+      "default": "#lights"
+    },
+    "plugs_hash": {
+      "type": "string",
+      "title": "Hash de navigation prises",
+      "description": "Identifiant pour le popup des prises",
+      "default": "#plugs"
+    },
+    "covers_hash": {
+      "type": "string",
+      "title": "Hash de navigation volets",
+      "description": "Identifiant pour le popup des volets",
+      "default": "#covers"
+    },
+    "presence_hash": {
+      "type": "string",
+      "title": "Hash de navigation présence",
+      "description": "Identifiant pour le popup de présence",
+      "default": "#presence"
+    },
+    "open_hash": {
+      "type": "string",
+      "title": "Hash de navigation ouvertures",
+      "description": "Identifiant pour le popup des ouvertures",
+      "default": "#openings"
+    },
+    "audio_hash": {
+      "type": "string",
+      "title": "Hash de navigation audio",
+      "description": "Identifiant pour le popup audio",
+      "default": "#audio"
+    },
+    "video_hash": {
+      "type": "string",
+      "title": "Hash de navigation vidéo",
+      "description": "Identifiant pour le popup vidéo",
+      "default": "#video"
+    },
+    "cameras_hash": {
+      "type": "string",
+      "title": "Hash de navigation caméras",
+      "description": "Identifiant pour le popup caméras",
+      "default": "#cameras"
+    },
+    "audio_cover_entity": {
+      "type": "string",
+      "title": "Entité audio principale",
+      "description": "Entité pour l'affichage de la pochette audio",
+      "selector": {
+        "entity": {
+          "domain": ["media_player"]
+        }
+      }
+    },
+    "video_cover_entity": {
+      "type": "string",
+      "title": "Entité vidéo principale",
+      "description": "Entité pour l'affichage de la pochette vidéo",
+      "selector": {
+        "entity": {
+          "domain": ["media_player"]
+        }
+      }
+    },
+    "covers_label": {
+      "type": "string",
+      "title": "Libellé des volets",
+      "description": "Texte affiché pour le bouton des volets",
+      "default": "Volets",
+      "minLength": 1,
+      "maxLength": 30
+    },
+    "extra_chips": {
+      "type": "array",
+      "title": "Chips supplémentaires",
+      "description": "Chips personnalisés additionnels",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "template"
+          },
+          "icon": {
+            "type": "string",
+            "title": "Icône",
+            "description": "Icône Material Design Icons",
+            "pattern": "^mdi:[a-zA-Z0-9_-]+$"
+          },
+          "icon_color": {
+            "type": "string",
+            "title": "Couleur de l'icône",
+            "description": "Couleur au format hexadécimal",
+            "pattern": "^#[0-9a-fA-F]{6}$"
+          },
+          "content": {
+            "type": "string",
+            "title": "Contenu",
+            "description": "Texte affiché dans le chip",
+            "minLength": 1
+          },
+          "tap_action": {
+            "$ref": "#/definitions/action"
+          }
+        },
+        "required": ["type", "icon", "icon_color", "content"]
+      },
+      "default": []
+    },
+    "features": {
+      "type": "array",
+      "title": "Fonctionnalités avancées",
+      "description": "Options expérimentales pour HA 2025.12+",
+      "items": {
+        "type": "string",
+        "enum": ["full_card_actions", "enhanced_animations", "adaptive_themes"]
+      },
+      "default": []
+    },
+    "tap_action": {
+      "$ref": "#/definitions/action",
+      "title": "Action au clic",
+      "description": "Action lors du clic sur la carte"
+    },
+    "hold_action": {
+      "$ref": "#/definitions/action",
+      "title": "Action au maintien",
+      "description": "Action lors du maintien sur la carte"
+    },
+    "double_tap_action": {
+      "$ref": "#/definitions/action",
+      "title": "Action au double-clic",
+      "description": "Action lors du double-clic sur la carte"
+    }
+  },
+  "required": ["type"],
+  "definitions": {
+    "action": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": ["more-info", "navigate", "call-service", "none"],
+          "title": "Type d'action"
+        },
+        "navigation_path": {
+          "type": "string",
+          "title": "Path de navigation",
+          "description": "URL ou chemin de navigation"
+        },
+        "service": {
+          "type": "string",
+          "title": "Service",
+          "description": "Service à appeler (domain.service)",
+          "pattern": "^[a-z0-9_]+\\.[a-z0-9_]+$"
+        },
+        "service_data": {
+          "type": "object",
+          "title": "Données du service",
+          "description": "Paramètres pour le service"
+        },
+        "entity": {
+          "type": "string",
+          "title": "Entité",
+          "description": "Entité cible pour l'action",
+          "selector": {
+            "entity": {}
+          }
+        }
+      }
+    }
+  }
+}

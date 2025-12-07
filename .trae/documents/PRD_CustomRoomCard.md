@@ -17,6 +17,7 @@ Notre custom room card comprend les pages principales suivantes :
 1. **Room Card principale** : affichage des capteurs, contrôles interactifs, design moderne
 2. **Configuration popup** : paramètres personnalisables pour chaque type d'entité
 3. **Media popup** : contrôle multimédia avec affichage des pochettes
+4. **Éditeur visuel HA** : interface graphique complète pour la configuration sans YAML
 
 ### 2.3 Page Details
 
@@ -33,6 +34,7 @@ Notre custom room card comprend les pages principales suivantes :
 | Room Card principale | Section caméras | Affichage des flux caméra avec snapshots |
 | Configuration popup | Paramètres card | Personnalisation des couleurs, tailles, comportements |
 | Media popup | Contrôle multimédia | Affichage des pochettes, métadonnées, contrôles avancés |
+| Éditeur visuel HA | Interface configuration | Configuration graphique complète avec validation, autocomplétion, descriptions contextuelles |
 
 ## 3. Core Process
 
@@ -44,9 +46,10 @@ Notre custom room card comprend les pages principales suivantes :
 5. Les changements d'état se reflètent en temps réel sur la card
 
 ### Admin Flow
-1. L'admin configure les entités à afficher via le popup de configuration
-2. Personnalisation des couleurs et styles selon les préférences
-3. Sauvegarde des paramètres pour persistence
+1. L'admin configure les entités via l'éditeur visuel de Home Assistant
+2. Configuration complète via interface graphique (couleurs, styles, comportements)
+3. Validation automatique et autocomplétion des entités
+4. Sauvegarde des paramètres pour persistence
 
 ```mermaid
 graph TD
