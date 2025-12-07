@@ -1,0 +1,64 @@
+export declare const CARD_VERSION = "1.0.0";
+export declare const CARD_NAME = "ha-room-card";
+export declare const DEFAULT_CONFIG: {
+    name: string;
+    icon: string;
+    icon_color: string;
+    bg_start: string;
+    bg_end: string;
+    temp_entity: string;
+    hum_entity: string;
+    extra_chips: never[];
+    power_list: never[];
+    light_list: never[];
+    presence_list: never[];
+    open_list: never[];
+    lights_hash: string;
+    plugs_hash: string;
+    covers_hash: string;
+    presence_hash: string;
+    open_hash: string;
+    audio_hash: string;
+    video_hash: string;
+    cameras_hash: string;
+    audio_cover_entity: string;
+    video_cover_entity: string;
+    covers_label: string;
+};
+export declare const FEATURES: {
+    HIDE_CLIMATE_LABEL: string;
+    HIDE_AREA_STATS: string;
+    HIDE_ROOM_ICON: string;
+    HIDE_SENSOR_ICONS: string;
+    HIDE_SENSOR_LABELS: string;
+    EXCLUDE_DEFAULT_ENTITIES: string;
+    SKIP_CLIMATE_STYLES: string;
+    SKIP_ENTITY_STYLES: string;
+    MULTI_LIGHT_BACKGROUND: string;
+    IGNORE_ENTITY: string;
+    STICKY_ENTITIES: string;
+    SLIDER: string;
+    FULL_CARD_ACTIONS: string;
+};
+export declare const DEFAULT_SENSOR_CLASSES: string[];
+export declare const DEFAULT_COLORS: {
+    temperature: string;
+    humidity: string;
+    power: string;
+    presence: string;
+    open: string;
+    light: string;
+    plug: string;
+    cover: string;
+    audio: string;
+    video: string;
+    camera: string;
+};
+export declare const OPERATORS: {
+    GT: string;
+    GTE: string;
+    LT: string;
+    LTE: string;
+    EQ: string;
+};
+//# sourceMappingURL=const.d.ts.map
