@@ -1,6 +1,6 @@
 {
   "name": "ha-room-card",
-  "version": "1.23.0",
+  "version": "1.23.21",
   "description": "Custom room card for Home Assistant with modern design and interactive features",
   "type": "module",
   "main": "dist/ha-room-card.js",
@@ -15,7 +15,8 @@
     "build-and-commit": "npm run build && git add dist/ && git commit -m '🚀 Update dist files'",
     "version": "node scripts/auto-version.js",
     "version-tag": "node scripts/auto-version.js --tag",
-    "release": "npm run version-tag && npm run build && git push && git push --tags"
+    "create-release": "node scripts/create-release.js",
+    "release": "npm run version-tag && npm run build && npm run create-release"
   },
   "keywords": [
     "home-assistant",
