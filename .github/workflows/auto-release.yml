@@ -1,0 +1,87 @@
+name: 🏷️ Auto Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Generate Changelog
+        id: changelog
+        run: |
+          # Récupérer la version depuis le tag
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          
+          # Générer le changelog depuis les commits
+          echo "## 📦 Changelog v$VERSION" > CHANGELOG_RELEASE.md
+          echo "" >> CHANGELOG_RELEASE.md
+          
+          # Récupérer les commits depuis le dernier tag
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          
+          if [ -n "$PREV_TAG" ]; then
+            echo "### 🚀 Nouvelles fonctionnalités" >> CHANGELOG_RELEASE.md
+            git log --pretty=format:"- %s" $PREV_TAG..HEAD | grep -E "^feat|^feature" | sed 's/^[a-z]*: /- /' >> CHANGELOG_RELEASE.md || echo "- Aucune nouvelle fonctionnalité" >> CHANGELOG_RELEASE.md
+            echo "" >> CHANGELOG_RELEASE.md
+            
+            echo "### 🐛 Corrections" >> CHANGELOG_RELEASE.md
+            git log --pretty=format:"- %s" $PREV_TAG..HEAD | grep -E "^fix" | sed 's/^[a-z]*: /- /' >> CHANGELOG_RELEASE.md || echo "- Aucune correction" >> CHANGELOG_RELEASE.md
+          else
+            echo "### 🎉 Première release" >> CHANGELOG_RELEASE.md
+            echo "- Version initiale avec toutes les fonctionnalités" >> CHANGELOG_RELEASE.md
+          fi
+          
+          echo "" >> CHANGELOG_RELEASE.md
+          echo "---" >> CHANGELOG_RELEASE.md
+          echo "📅 Date: $(date '+%d/%m/%Y %H:%M')" >> CHANGELOG_RELEASE.md
+          echo "🏷️ Version: $VERSION" >> CHANGELOG_RELEASE.md
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.changelog.outputs.version }}
+          name: 🚀 HA Room Card v${{ steps.changelog.outputs.version }}
+          body_path: CHANGELOG_RELEASE.md
+          files: |
+            dist/ha-room-card.js
+            dist/ha-room-card-schema.json
+            dist/**/*.d.ts
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update HACS info
+        run: |
+          VERSION=${{ steps.changelog.outputs.version }}
+          jq --arg version "$VERSION" '.version = $version' hacs-repository-info.json > hacs-repository-info.json.tmp
+          mv hacs-repository-info.json.tmp hacs-repository-info.json
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add hacs-repository-info.json
+          git commit -m "📝 Update HACS info to v$VERSION [skip ci]"
+          git push

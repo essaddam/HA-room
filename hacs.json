@@ -1,21 +1,12 @@
 {
   "name": "HA Room Card",
   "render_readme": true,
-  "filename": "src/ha-room-card.ts",
+  "filename": "ha-room-card.js",
   "homeassistant": "2025.12.0",
   "country": ["FR"],
   "domains": ["lovelace"],
   "homeassistant_version": "2025.12.0",
   "persistent_directory": true,
   "zip_release": false,
-  "javascript": true,
-  "files": [
-    "src/ha-room-card.ts",
-    "src/ha-room-card-editor.ts",
-    "src/components/",
-    "src/const.ts",
-    "src/types.ts",
-    "src/utils.ts",
-    "ha-room-card-schema.json"
-  ]
+  "javascript": true
 }

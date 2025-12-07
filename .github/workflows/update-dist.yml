@@ -1,13 +1,22 @@
-name: Update dist folder
+name: 🚀 Auto-update dist folder
 
 on:
   push:
+    branches: [ main, master ]
+    paths:
+      - 'src/**'
+      - 'package*.json'
+      - 'rollup.config.js'
+      - 'ha-room-card-schema.json'
+      - 'tsconfig.json'
+  pull_request:
     branches: [ main ]
     paths:
       - 'src/**'
       - 'package*.json'
       - 'rollup.config.js'
       - 'ha-room-card-schema.json'
+      - 'tsconfig.json'
 
 jobs:
   update-dist:
@@ -38,8 +47,10 @@ jobs:
         run: |
           if [ -n "$(git status --porcelain)" ]; then
             echo "changed=true" >> $GITHUB_OUTPUT
+            echo "📦 Changes detected in dist/"
           else
             echo "changed=false" >> $GITHUB_OUTPUT
+            echo "✅ No changes in dist/"
           fi
 
       - name: Commit and push if changed
@@ -48,5 +59,12 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add dist/
-          git commit -m "🚀 Auto-update dist folder [skip ci]"
+          git commit -m "🚀 Auto-update dist folder [skip ci]
+
+          📦 Built files:
+          - ha-room-card.js (main card)
+          - ha-room-card-schema.json (editor schema)
+          - Component definitions and types
+
+          🔄 Auto-generated on: $(date)"
           git push
