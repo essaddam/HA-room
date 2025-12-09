@@ -24,35 +24,19 @@ on:
       - 'tsconfig.json'
       - '.github/workflows/**'
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version to release (e.g., 1.46.1)'
-        required: false
-        default: ''
-      create_release:
-        description: 'Create GitHub release'
-        required: false
-        default: 'false'
-        type: boolean
 
 jobs:
-  # CI Tests
   test:
     runs-on: ubuntu-latest
-    if: github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/')
-
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x]
-
+    
     steps:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: '20'
         cache: 'npm'
 
     - name: Install dependencies
@@ -67,17 +51,10 @@ jobs:
     - name: Build
       run: npm run build
 
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: build-${{ matrix.node-version }}
-        path: dist/
-
-  # Auto-update dist folder
   update-dist:
     runs-on: ubuntu-latest
     needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/')
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
       contents: write
       
@@ -104,10 +81,8 @@ jobs:
         run: |
           if [ -n "$(git status --porcelain)" ]; then
             echo "changed=true" >> $GITHUB_OUTPUT
-            echo "📦 Changes detected in dist/"
           else
             echo "changed=false" >> $GITHUB_OUTPUT
-            echo "✅ No changes in dist/"
           fi
 
       - name: Commit and push if changed
@@ -116,14 +91,13 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add dist/
-          git commit -m "🚀 Auto-update dist folder [skip ci]\n\n📦 Built files:\n- ha-room-card.js (main card)\n- ha-room-card-schema.json (editor schema)\n- Component definitions and types\n\n🔄 Auto-generated on: $(date)"
+          git commit -m "🚀 Auto-update dist folder [skip ci]"
           git push
 
-  # Auto-tag on version change
   auto-tag:
     runs-on: ubuntu-latest
     needs: update-dist
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/')
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
       contents: write
     steps:
@@ -144,10 +118,8 @@ jobs:
           TAG="v${{ steps.pkg.outputs.version }}"
           if git rev-parse "$TAG" >/dev/null 2>&1; then
             echo "exists=true" >> $GITHUB_OUTPUT
-            echo "✅ Tag $TAG already exists"
           else
             echo "exists=false" >> $GITHUB_OUTPUT
-            echo "ℹ️ Tag $TAG does not exist"
           fi
 
       - name: Create and push tag
@@ -158,12 +130,10 @@ jobs:
           git config user.email "action@github.com"
           git tag -a "$TAG" -m "Release version $TAG"
           git push origin "$TAG"
-          echo "🏷️ Created tag $TAG and pushed to origin"
 
-  # Release
   release:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') || (github.event_name == 'workflow_dispatch' && github.event.inputs.create_release == 'true')
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     permissions:
       contents: write
       
@@ -173,10 +143,6 @@ jobs:
         with:
           fetch-depth: 0
       
-      - name: Checkout tag
-        if: github.event_name == 'push'
-        run: git checkout ${{ github.ref_name }}
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -189,79 +155,23 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Generate Changelog
-        id: changelog
-        run: |
-          # Récupérer la version depuis le tag ou l'input
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            VERSION="${{ github.event.inputs.version }}"
-            if [ -z "$VERSION" ]; then
-              VERSION=$(jq -r .version package.json)
-            fi
-          else
-            VERSION=${GITHUB_REF#refs/tags/v}
-          fi
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          
-          # Récupérer les commits depuis le dernier tag
-          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "v0.0.0")
-          
-          # Générer le changelog depuis les commits
-          echo "## 📦 Changelog v$VERSION" > CHANGELOG_RELEASE.md
-          echo "" >> CHANGELOG_RELEASE.md
-          
-          if [ -n "$PREV_TAG" ] && [ "$PREV_TAG" != "v0.0.0" ]; then
-            echo "### 📝 Derniers changements" >> CHANGELOG_RELEASE.md
-            git log --pretty=format:"- %s" $PREV_TAG..HEAD | head -10 >> CHANGELOG_RELEASE.md
-          else
-            echo "### 🎉 Release initiale" >> CHANGELOG_RELEASE.md
-            echo "- Première version avec toutes les fonctionnalités" >> CHANGELOG_RELEASE.md
-          fi
-          
-          echo "" >> CHANGELOG_RELEASE.md
-          echo "### 🚀 Fonctionnalités principales" >> CHANGELOG_RELEASE.md
-          echo "- 🏠 Carte de pièce moderne avec design personnalisable" >> CHANGELOG_RELEASE.md
-          echo "- 🌡️ Support des capteurs climatiques (température, humidité)" >> CHANGELOG_RELEASE.md
-          echo "- ⚡ Surveillance de la consommation électrique en temps réel" >> CHANGELOG_RELEASE.md
-          echo "- 👥 Détection de présence avec indicateurs animés" >> CHANGELOG_RELEASE.md
-          echo "- 💡 Contrôle des lumières avec réglage de luminosité" >> CHANGELOG_RELEASE.md
-          echo "- 🔌 Gestion des prises et appareils électriques" >> CHANGELOG_RELEASE.md
-          
-          echo "" >> CHANGELOG_RELEASE.md
-          echo "### 🐛 Corrections et améliorations" >> CHANGELOG_RELEASE.md
-          echo "- Correction du schemaURL pour la compatibilité HACS" >> CHANGELOG_RELEASE.md
-          echo "- Ajout de logs de débogage détaillés" >> CHANGELOG_RELEASE.md
-          echo "- Amélioration de la configuration de build" >> CHANGELOG_RELEASE.md
-          
-          echo "" >> CHANGELOG_RELEASE.md
-          echo "---" >> CHANGELOG_RELEASE.md
-          echo "📅 Date: $(date '+%d/%m/%Y %H:%M')" >> CHANGELOG_RELEASE.md
-          echo "🏷️ Version: $VERSION" >> CHANGELOG_RELEASE.md
-
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ steps.changelog.outputs.version }}
-          name: 🚀 HA Room Card v${{ steps.changelog.outputs.version }}
-          body_path: CHANGELOG_RELEASE.md
+          tag_name: ${{ github.ref_name }}
+          name: 🚀 HA Room Card ${{ github.ref_name }}
+          body: |
+            Auto-generated release from tag ${{ github.ref_name }}
+            
+            ## 📦 Built files:
+            - ha-room-card.js (main card)
+            - ha-room-card-schema.json (editor schema)
+            - Component definitions and types
           files: |
             dist/ha-room-card.js
             dist/ha-room-card-schema.json
             dist/**/*.d.ts
           draft: false
           prerelease: false
-          generate_release_notes: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Update HACS info
-        if: github.event_name == 'push'
-        run: |
-          VERSION=${{ steps.changelog.outputs.version }}
-          jq --arg version "$VERSION" '.version = $version' hacs-repository-info.json > hacs-repository-info.json.tmp
-          mv hacs-repository-info.json.tmp hacs-repository-info.json
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add hacs-repository-info.json
-          git commit -m "📝 Update HACS info to v$VERSION [skip ci]"
-          git push origin main
