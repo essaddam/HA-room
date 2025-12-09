@@ -56,19 +56,19 @@ jobs:
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer ${{ secrets.SYNTHETIC_API_KEY }}" \
             -d '{
-              "model": "claude-3-5-sonnet-20241022",
+              "model": "hf:moonshotai/kimi-K2-Thinking",
               "messages": [
                 {
                   "role": "system",
-                  "content": "Tu es un expert en développement de cartes Home Assistant. Génère un changelog professionnel en français à partir des messages de commits. Structure le changelog avec les sections: 🚀 Nouvelles fonctionnalités, 🐛 Corrections, 🔧 Améliorations. Sois concis mais informatif."
+                  "content": "Tu es un expert en développement de cartes Home Assistant et en analyse de commits. Génère un changelog professionnel en français à partir des messages de commits. Structure le changelog avec les sections: 🚀 Nouvelles fonctionnalités, 🐛 Corrections, 🔧 Améliorations, ⚡ Optimisations. Sois concis mais informatif. Analyse intelligemment chaque type de commit et regroupe les changements similaires."
                 },
                 {
                   "role": "user", 
-                  "content": "Génère un changelog pour la version v'$VERSION' de HA Room Card à partir de ces commits:\n\n'$COMMIT_MESSAGES'\n\nRetourne uniquement le contenu du changelog formaté en markdown, sans introduction ni conclusion."
+                  "content": "Génère un changelog détaillé pour la version v'$VERSION' de HA Room Card à partir de ces commits Git:\n\n'$COMMIT_MESSAGES'\n\nInstructions:\n- Analyse chaque commit et extrait les informations essentielles\n- Regroupe les changements par catégorie\n- Utilise des emojis appropriés pour chaque section\n- Sois précis sur les fonctionnalités ajoutées\n- Mentionne les corrections de bugs importantes\n- Ajoute les améliorations de performance\n- Format en markdown clair et lisible\n- Retourne UNIQUEMENT le contenu du changelog, sans introduction"
                 }
               ],
-              "max_tokens": 1000,
-              "temperature": 0.3
+              "max_tokens": 1500,
+              "temperature": 0.2
             }')
           
           # Extraire et formater le contenu
