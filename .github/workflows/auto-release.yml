@@ -29,7 +29,7 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Generate Changelog with Synthetic API
+      - name: Generate Changelog
         id: changelog
         run: |
           # Récupérer la version depuis le tag
@@ -39,47 +39,30 @@ jobs:
           # Récupérer les commits depuis le dernier tag
           PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
           
-          # Collecter les messages de commits
-          COMMIT_MESSAGES=""
-          if [ -n "$PREV_TAG" ]; then
-            COMMIT_MESSAGES=$(git log --pretty=format:"%s" $PREV_TAG..HEAD)
-          else
-            COMMIT_MESSAGES=$(git log --pretty=format:"%s")
-          fi
-          
-          # Utiliser l'API Synthetic pour générer un changelog intelligent
+          # Générer le changelog depuis les commits
           echo "## 📦 Changelog v$VERSION" > CHANGELOG_RELEASE.md
           echo "" >> CHANGELOG_RELEASE.md
           
-          # Appel à l'API Synthetic
-          RESPONSE=$(curl -s -X POST "https://api.synthetic.new/chat/completions" \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer ${{ secrets.SYNTHETIC_API_KEY }}" \
-            -d '{
-              "model": "hf:moonshotai/kimi-K2-Thinking",
-              "messages": [
-                {
-                  "role": "system",
-                  "content": "Tu es un expert en développement de cartes Home Assistant et en analyse de commits. Génère un changelog professionnel en français à partir des messages de commits. Structure le changelog avec les sections: 🚀 Nouvelles fonctionnalités, 🐛 Corrections, 🔧 Améliorations, ⚡ Optimisations. Sois concis mais informatif. Analyse intelligemment chaque type de commit et regroupe les changements similaires."
-                },
-                {
-                  "role": "user", 
-                  "content": "Génère un changelog détaillé pour la version v'$VERSION' de HA Room Card à partir de ces commits Git:\n\n'$COMMIT_MESSAGES'\n\nInstructions:\n- Analyse chaque commit et extrait les informations essentielles\n- Regroupe les changements par catégorie\n- Utilise des emojis appropriés pour chaque section\n- Sois précis sur les fonctionnalités ajoutées\n- Mentionne les corrections de bugs importantes\n- Ajoute les améliorations de performance\n- Format en markdown clair et lisible\n- Retourne UNIQUEMENT le contenu du changelog, sans introduction"
-                }
-              ],
-              "max_tokens": 1500,
-              "temperature": 0.2
-            }')
-          
-          # Extraire et formater le contenu
-          echo "$RESPONSE" | jq -r '.choices[0].message.content' >> CHANGELOG_RELEASE.md
+          if [ -n "$PREV_TAG" ]; then
+            echo "### 🚀 Nouvelles fonctionnalités" >> CHANGELOG_RELEASE.md
+            git log --pretty=format:"- %s" $PREV_TAG..HEAD | grep -E "^feat|^feature" | sed 's/^[a-z]*: /- /' | head -10 >> CHANGELOG_RELEASE.md || echo "- Aucune nouvelle fonctionnalité" >> CHANGELOG_RELEASE.md
+            echo "" >> CHANGELOG_RELEASE.md
+            
+            echo "### 🐛 Corrections" >> CHANGELOG_RELEASE.md
+            git log --pretty=format:"- %s" $PREV_TAG..HEAD | grep -E "^fix" | sed 's/^[a-z]*: /- /' | head -10 >> CHANGELOG_RELEASE.md || echo "- Aucune correction" >> CHANGELOG_RELEASE.md
+            echo "" >> CHANGELOG_RELEASE.md
+            
+            echo "### 🔧 Améliorations" >> CHANGELOG_RELEASE.md
+            git log --pretty=format:"- %s" $PREV_TAG..HEAD | grep -E "^chore|^refactor|^perf" | sed 's/^[a-z]*: /- /' | head -5 >> CHANGELOG_RELEASE.md || echo "- Aucune amélioration" >> CHANGELOG_RELEASE.md
+          else
+            echo "### 🎉 Première release" >> CHANGELOG_RELEASE.md
+            echo "- Version initiale avec toutes les fonctionnalités" >> CHANGELOG_RELEASE.md
+          fi
           
           echo "" >> CHANGELOG_RELEASE.md
           echo "---" >> CHANGELOG_RELEASE.md
           echo "📅 Date: $(date '+%d/%m/%Y %H:%M')" >> CHANGELOG_RELEASE.md
           echo "🏷️ Version: $VERSION" >> CHANGELOG_RELEASE.md
-        env:
-          SYNTHETIC_API_KEY: ${{ secrets.SYNTHETIC_API_KEY }}
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
