@@ -73,7 +73,15 @@ try {
 
     // Commiter les changements de version
     try {
-      execSync(`git add package.json`, { stdio: 'inherit' });
+      const filesToStage = [
+        'package.json',
+        'src/const.ts',
+        'README.md',
+        'CHANGELOG.md',
+        'hacs.json',
+        'hacs-repository-info.json'
+      ].filter(f => fs.existsSync(path.join(process.cwd(), f)));
+      execSync(`git add ${filesToStage.join(' ')}`, { stdio: 'inherit' });
       execSync(`git commit -m "🔖 Bump version to ${newVersion} [skip ci]"`, { stdio: 'inherit' });
       console.log(`✅ Version ${newVersion} commitée automatiquement`);
     } catch (error) {

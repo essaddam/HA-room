@@ -46,9 +46,41 @@ jobs:
     - name: Build
       run: npm run build
 
-  update-dist:
+  version-bump:
     runs-on: ubuntu-latest
     needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Compute version and update files
+        run: node scripts/auto-version.js --tag
+
+      - name: Push version bump and tags
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+          git push origin HEAD
+          git push origin --tags
+
+  update-dist:
+    runs-on: ubuntu-latest
+    needs: version-bump
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
       contents: write
@@ -225,6 +257,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/types.d.ts
-          asset_name: types.d.ts
+          asset_path: dist/ha-room-card.d.ts
+          asset_name: ha-room-card.d.ts
           asset_content_type: text/plain
