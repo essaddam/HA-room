@@ -28,7 +28,7 @@ console.info(
   description: 'Custom room card with modern design and interactive features',
   preview: true,
   documentationURL: 'https://github.com/yourusername/ha-room-card#readme',
-  schemaURL: '/hacsfiles/ha-room-card/ha-room-card.js',
+  schemaURL: '/hacsfiles/ha-room-card/ha-room-card-schema.json',
 });
 
 @customElement(CARD_NAME)
@@ -362,10 +362,10 @@ export class HaRoomCard extends LitElement {
 
   private _renderTemperatureChip(): TemplateResult | typeof nothing {
     if (!this.config.temp_entity) return nothing;
-    
+
     const temp = this.roomData.temperature;
     const content = temp !== undefined ? formatTemperature(temp) : '—';
-    
+
     return this._renderChip(
       'mdi:thermometer',
       'orange',
@@ -377,10 +377,10 @@ export class HaRoomCard extends LitElement {
 
   private _renderHumidityChip(): TemplateResult | typeof nothing {
     if (!this.config.hum_entity) return nothing;
-    
+
     const humidity = this.roomData.humidity;
     const content = humidity !== undefined ? formatHumidity(humidity) : '—';
-    
+
     return this._renderChip(
       'mdi:water-percent',
       'blue',
@@ -392,10 +392,10 @@ export class HaRoomCard extends LitElement {
 
   private _renderPowerChip(): TemplateResult | typeof nothing {
     if (!this.config.power_list?.length) return nothing;
-    
+
     const power = this.roomData.power_total || 0;
     const content = formatPower(power);
-    
+
     return this._renderChip(
       'mdi:flash',
       'yellow',
@@ -406,10 +406,10 @@ export class HaRoomCard extends LitElement {
 
   private _renderPresenceChip(): TemplateResult | typeof nothing {
     if (!this.config.presence_list?.length) return nothing;
-    
+
     const count = this.roomData.presence_count || 0;
     const content = `${count} présence${count > 1 ? 's' : ''}`;
-    
+
     return this._renderChip(
       'mdi:motion-sensor',
       'teal',
@@ -420,10 +420,10 @@ export class HaRoomCard extends LitElement {
 
   private _renderOpenChip(): TemplateResult | typeof nothing {
     if (!this.config.open_list?.length) return nothing;
-    
+
     const count = this.roomData.open_count || 0;
     const content = `${count} ouvert${count > 1 ? 's' : ''}`;
-    
+
     return this._renderChip(
       'mdi:door-open',
       'red',
@@ -446,9 +446,9 @@ export class HaRoomCard extends LitElement {
         @click=${() => this._handleButtonAction(action)}
       >
         ${coverImage
-          ? html`<img class="media-cover" src="${coverImage}" alt="${title}">`
-          : html`<ha-icon class="button-icon" icon=${icon}></ha-icon>`
-        }
+        ? html`<img class="media-cover" src="${coverImage}" alt="${title}">`
+        : html`<ha-icon class="button-icon" icon=${icon}></ha-icon>`
+      }
         <div class="button-title">${title}</div>
         <div class="button-subtitle">${subtitle}</div>
       </div>
@@ -528,7 +528,7 @@ export class HaRoomCard extends LitElement {
       if (state) {
         const mediaTitle = state.attributes?.media_title;
         const isPlaying = ['playing', 'paused'].includes(state.state);
-        
+
         subtitle = isPlaying && mediaTitle ? mediaTitle : (isPlaying ? 'En cours' : 'Arrêt');
         coverImage = state.attributes?.entity_picture;
       }
@@ -553,7 +553,7 @@ export class HaRoomCard extends LitElement {
       if (state) {
         const mediaTitle = state.attributes?.media_title;
         const isActive = ['playing', 'paused', 'on', 'idle'].includes(state.state);
-        
+
         subtitle = isActive && mediaTitle ? mediaTitle : (isActive ? 'Actif' : 'Off');
         coverImage = state.attributes?.entity_picture;
       }
@@ -599,10 +599,10 @@ export class HaRoomCard extends LitElement {
         aria-label=${`Room card for ${this.config.name || 'Room'}`}
       >
         <!-- Full card overlay for actions -->
-        ${this.config.features?.includes('full_card_actions') 
-          ? html`<div class="full-card-overlay" @click=${() => this._handleCardAction()}></div>`
-          : typeof nothing
-        }
+        ${this.config.features?.includes('full_card_actions')
+        ? html`<div class="full-card-overlay" @click=${() => this._handleCardAction()}></div>`
+        : typeof nothing
+      }
 
         <!-- Header -->
         <div class="card-header">
@@ -617,9 +617,9 @@ export class HaRoomCard extends LitElement {
         <div class="chips-container">
           ${this._renderTemperatureChip()}
           ${this._renderHumidityChip()}
-          ${this.config.extra_chips?.map(chip => 
-            this._renderChip(chip.icon, chip.icon_color, chip.content, chip.tap_action)
-          )}
+          ${this.config.extra_chips?.map(chip =>
+        this._renderChip(chip.icon, chip.icon_color, chip.content, chip.tap_action)
+      )}
           ${this._renderPowerChip()}
           ${this._renderPresenceChip()}
           ${this._renderOpenChip()}
