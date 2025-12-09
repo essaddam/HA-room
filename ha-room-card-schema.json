@@ -7,7 +7,7 @@
   "properties": {
     "type": {
       "type": "string",
-      "const": "ha-room-card",
+      "const": "custom:ha-room-card",
       "description": "Type of the card"
     },
     "name": {

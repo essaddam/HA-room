@@ -24,7 +24,7 @@ console.info(
 console.log('[HA Room Card] Registering custom card...');
 (window as any).customCards = (window as any).customCards || [];
 const cardConfig = {
-  type: CARD_NAME,
+  type: `custom:${CARD_NAME}`,
   name: 'HA Room Card',
   description: 'Custom room card with modern design and interactive features',
   preview: true,
