@@ -301,7 +301,7 @@ export class HaRoomCardEditor {
   static getStubConfig() {
     console.log('[HA Room Card Editor] Getting stub config...');
     const stubConfig = {
-      type: "ha-room-card",
+      type: "custom:ha-room-card",
       name: 'Salon',
       icon: 'mdi:home',
       icon_color: '#ffffff',
