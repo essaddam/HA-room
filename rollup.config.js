@@ -10,7 +10,7 @@ const copySchema = {
   writeBundle() {
     const schemaPath = 'ha-room-card-schema.json';
     const distPath = 'dist/ha-room-card-schema.json';
-    
+
     if (existsSync(schemaPath)) {
       copyFileSync(schemaPath, distPath);
       console.log('✅ Schema JSON copied to dist/');
@@ -24,6 +24,7 @@ export default {
     file: 'dist/ha-room-card.js',
     format: 'es',
     sourcemap: true,
+    sourcemapFile: 'dist/ha-room-card.js.map',
   },
   plugins: [
     nodeResolve(),

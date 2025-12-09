@@ -21,18 +21,24 @@ try {
   // Essayer de récupérer le message de commit en cours
   let commitMessage = '';
   try {
-    commitMessage = execSync('git log -1 --pretty=%B --staged', { encoding: 'utf8' }).trim();
+    // Vérifier s'il y a des changements staged
+    const staged = execSync('git diff --cached --name-only', { encoding: 'utf8' }).trim();
+    if (staged) {
+      commitMessage = execSync('git log -1 --pretty=%B --cached', { encoding: 'utf8' }).trim();
+    } else {
+      commitMessage = execSync('git log -1 --pretty=%B', { encoding: 'utf8' }).trim();
+    }
   } catch (e) {
     // Si pas de staged, essayer le dernier commit
     commitMessage = execSync('git log -1 --pretty=%B', { encoding: 'utf8' }).trim();
   }
-  
+
   console.log(`📝 Commit analysé : ${commitMessage.substring(0, 50)}...`);
-  
+
   // Analyser le type de commit (conventional commits)
   let newVersion = currentVersion;
   let versionType = null;
-  
+
   if (commitMessage.startsWith('feat:') || commitMessage.startsWith('feature:')) {
     versionType = 'minor';
     newVersion = incrementVersion(currentVersion, 'minor');
@@ -46,18 +52,18 @@ try {
     versionType = 'patch';
     newVersion = incrementVersion(currentVersion, 'patch');
   }
-  
+
   // Vérifier si la version a changé
   if (newVersion !== currentVersion) {
     console.log(`🚀 Incrémentation de version : ${currentVersion} → ${newVersion} (${versionType})`);
-    
+
     // Mettre à jour package.json
     packageJson.version = newVersion;
     fs.writeFileSync(packagePath, JSON.stringify(packageJson, null, 2) + '\n');
-    
+
     // Mettre à jour les autres fichiers si nécessaire
     updateVersionInFiles(newVersion);
-    
+
     // Commiter les changements de version
     try {
       execSync(`git add package.json`, { stdio: 'inherit' });
@@ -66,7 +72,7 @@ try {
     } catch (error) {
       console.log('ℹ️  Pas de changements de version à commiter');
     }
-    
+
     // Créer un tag si demandé
     if (process.argv.includes('--tag')) {
       try {
@@ -76,11 +82,11 @@ try {
         console.log(`⚠️  Impossible de créer le tag : ${error.message}`);
       }
     }
-    
+
   } else {
     console.log('✅ Aucune incrémentation de version nécessaire');
   }
-  
+
 } catch (error) {
   console.error('❌ Erreur lors de l\'analyse du commit :', error.message);
   process.exit(1);
@@ -88,7 +94,7 @@ try {
 
 function incrementVersion(version, type) {
   const [major, minor, patch] = version.split('.').map(Number);
-  
+
   switch (type) {
     case 'major':
       return `${major + 1}.0.0`;
@@ -106,30 +112,45 @@ function updateVersionInFiles(newVersion) {
   const filesToUpdate = [
     'src/const.ts',
     'README.md',
-    'CHANGELOG.md'
+    'CHANGELOG.md',
+    'hacs.json',
+    'hacs-repository-info.json'
   ];
-  
+
   filesToUpdate.forEach(file => {
     try {
       if (fs.existsSync(file)) {
         let content = fs.readFileSync(file, 'utf8');
-        
+
         // Remplacer les versions dans différents formats
         content = content.replace(
           /CARD_VERSION = ['"`]([^'"`]+)['"`]/g,
           `CARD_VERSION = '${newVersion}'`
         );
-        
+
         content = content.replace(
           /version: ['"`]([^'"`]+)['"`]/g,
           `version: "${newVersion}"`
         );
-        
+
+        // Pour les fichiers JSON
+        if (file.endsWith('.json')) {
+          try {
+            const jsonData = JSON.parse(content);
+            if (jsonData.version !== undefined) {
+              jsonData.version = newVersion;
+              content = JSON.stringify(jsonData, null, 2);
+            }
+          } catch (e) {
+            // Ignorer les erreurs de parsing JSON
+          }
+        }
+
         content = content.replace(
           /## \[v?(\d+\.\d+\.\d+)\]/g,
           `## [v${newVersion}]`
         );
-        
+
         fs.writeFileSync(file, content);
         console.log(`📄 ${file} mis à jour`);
       }
