@@ -75,6 +75,30 @@ jobs:
       - name: Build
         run: npm run build
 
+  verify-pr-dist:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify no dist changes in PR
+        run: |
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          echo "Comparing files against base SHA: $BASE_SHA"
+          CHANGED=$(git diff --name-only "$BASE_SHA"...HEAD | grep '^dist/' || true)
+          if [ -n "$CHANGED" ]; then
+            echo "dist/ changes detected in PR:"
+            echo "$CHANGED"
+            echo "Please do not commit built files. CI updates dist on main."
+            exit 1
+          else
+            echo "No dist/ changes in PR."
+          fi
+
       - name: Check for changes
         id: verify-changed-files
         run: |
