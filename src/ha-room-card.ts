@@ -20,6 +20,9 @@ console.info(
   'color: white; font-weight: bold; background: dimgray',
 );
 
+// Test modification for GitHub Actions workflow
+console.log('🚀 GitHub Actions workflow test - modification effectuée');
+
 // Register the card for the UI card picker
 console.log('[HA Room Card] Registering custom card...');
 (window as any).customCards = (window as any).customCards || [];
