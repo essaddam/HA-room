@@ -9,6 +9,11 @@ on:
       - 'rollup.config.js'
       - 'ha-room-card-schema.json'
       - 'tsconfig.json'
+      - '.github/workflows/**'
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+'
+      - 'v[0-9]+'
   pull_request:
     branches: [ main ]
     paths:
@@ -17,6 +22,7 @@ on:
       - 'rollup.config.js'
       - 'ha-room-card-schema.json'
       - 'tsconfig.json'
+      - '.github/workflows/**'
   workflow_dispatch:
     inputs:
       version:
@@ -28,11 +34,6 @@ on:
         required: false
         default: 'false'
         type: boolean
-  push:
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
-      - 'v[0-9]+.[0-9]+'
-      - 'v[0-9]+'
 
 jobs:
   # CI Tests
