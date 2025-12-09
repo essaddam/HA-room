@@ -22,6 +22,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: main
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -91,6 +92,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update HACS info
+        if: github.event_name == 'push'
         run: |
           VERSION=${{ steps.changelog.outputs.version }}
           jq --arg version "$VERSION" '.version = $version' hacs-repository-info.json > hacs-repository-info.json.tmp
@@ -99,4 +101,4 @@ jobs:
           git config --local user.name "GitHub Action"
           git add hacs-repository-info.json
           git commit -m "📝 Update HACS info to v$VERSION [skip ci]"
-          git push
+          git push origin main
