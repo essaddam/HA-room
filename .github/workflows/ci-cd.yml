@@ -10,10 +10,6 @@ on:
       - 'ha-room-card-schema.json'
       - 'tsconfig.json'
       - '.github/workflows/**'
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
-      - 'v[0-9]+.[0-9]+'
-      - 'v[0-9]+'
   pull_request:
     branches: [ main ]
     paths:
@@ -123,6 +119,8 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
       contents: write
+    outputs:
+      tag: ${{ steps.tag.outputs.value }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -134,6 +132,11 @@ jobs:
         run: |
           VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Set tag output
+        id: tag
+        run: |
+          echo "value=v${{ steps.pkg.outputs.version }}" >> $GITHUB_OUTPUT
 
       - name: Check if tag exists
         id: check
@@ -156,16 +159,16 @@ jobs:
 
   release:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    needs: auto-tag
+    if: needs.auto-tag.outputs.tag != ''
     permissions:
       contents: write
-      
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -179,22 +182,49 @@ jobs:
         run: npm run build
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref_name }}
-          name: 🚀 HA Room Card ${{ github.ref_name }}
+          tag_name: ${{ needs.auto-tag.outputs.tag }}
+          release_name: 🚀 HA Room Card ${{ needs.auto-tag.outputs.tag }}
           body: |
-            Auto-generated release from tag ${{ github.ref_name }}
+            Auto-generated release for ${{ needs.auto-tag.outputs.tag }}
             
             ## 📦 Built files:
             - ha-room-card.js (main card)
             - ha-room-card-schema.json (editor schema)
-            - Component definitions and types
-          files: |
-            dist/ha-room-card.js
-            dist/ha-room-card-schema.json
-            dist/**/*.d.ts
+            - Type definitions
           draft: false
           prerelease: false
+
+      - name: Upload ha-room-card.js
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/ha-room-card.js
+          asset_name: ha-room-card.js
+          asset_content_type: application/javascript
+
+      - name: Upload ha-room-card-schema.json
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/ha-room-card-schema.json
+          asset_name: ha-room-card-schema.json
+          asset_content_type: application/json
+
+      - name: Upload type definitions
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/types.d.ts
+          asset_name: types.d.ts
+          asset_content_type: text/plain
