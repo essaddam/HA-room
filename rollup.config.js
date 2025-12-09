@@ -34,6 +34,10 @@ export default {
       format: {
         comments: false,
       },
+      compress: {
+        drop_console: false,
+        drop_debugger: false,
+      },
     }),
   ],
   external: ['home-assistant-js-websocket'],

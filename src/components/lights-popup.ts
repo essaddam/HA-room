@@ -140,16 +140,56 @@ export class LightsPopup extends PopupBase {
   }
 
   private _toggleLight(entityId: string): void {
-    const isOn = isEntityOn(this.hass, entityId);
-    this.hass.callService('light', isOn ? 'turn_off' : 'turn_on', {
-      entity_id: entityId
-    });
+    console.log('[Lights Popup] Toggling light:', entityId);
+    
+    if (!this.hass) {
+      console.error('[Lights Popup] Home Assistant instance not available');
+      return;
+    }
+    
+    try {
+      const isOn = isEntityOn(this.hass, entityId);
+      console.log('[Lights Popup] Light current state:', { entityId, isOn });
+      
+      const service = isOn ? 'turn_off' : 'turn_on';
+      console.log('[Lights Popup] Calling service:', { service, entityId });
+      
+      this.hass.callService('light', service, {
+        entity_id: entityId
+      });
+      
+      console.log('[Lights Popup] Service call initiated successfully');
+    } catch (error) {
+      console.error('[Lights Popup] Error toggling light:', { entityId, error });
+    }
   }
 
   private _setBrightness(entityId: string, brightness: string): void {
-    this.hass.callService('light', 'turn_on', {
-      entity_id: entityId,
-      brightness: parseInt(brightness)
-    });
+    console.log('[Lights Popup] Setting brightness:', { entityId, brightness });
+    
+    if (!this.hass) {
+      console.error('[Lights Popup] Home Assistant instance not available');
+      return;
+    }
+    
+    try {
+      const brightnessValue = parseInt(brightness);
+      console.log('[Lights Popup] Parsed brightness value:', brightnessValue);
+      
+      if (isNaN(brightnessValue)) {
+        console.error('[Lights Popup] Invalid brightness value:', brightness);
+        return;
+      }
+      
+      console.log('[Lights Popup] Calling turn_on service with brightness');
+      this.hass.callService('light', 'turn_on', {
+        entity_id: entityId,
+        brightness: brightnessValue
+      });
+      
+      console.log('[Lights Popup] Brightness service call initiated successfully');
+    } catch (error) {
+      console.error('[Lights Popup] Error setting brightness:', { entityId, brightness, error });
+    }
   }
 }

@@ -9,23 +9,33 @@ export class HaRoomCardEditor {
    * Get the form schema for the visual editor
    */
   static getConfigForm() {
+    console.log('[HA Room Card Editor] Getting config form...');
     // Validation function for the configuration
     const assertConfig = (config: HaRoomCardConfig) => {
+      console.log('[HA Room Card Editor] Validating config:', config);
+
       if (!config.name || typeof config.name !== 'string') {
+        console.error('[HA Room Card Editor] Name validation failed:', config.name);
         throw new Error('Le nom de la pièce est requis et doit être une chaîne de caractères');
       }
       if (config.icon && typeof config.icon !== 'string') {
+        console.error('[HA Room Card Editor] Icon validation failed:', config.icon);
         throw new Error('L\'icône doit être une chaîne de caractères valide');
       }
       if (config.icon_color && !/^#[0-9a-fA-F]{6}$/.test(config.icon_color)) {
+        console.error('[HA Room Card Editor] Icon color validation failed:', config.icon_color);
         throw new Error('La couleur de l\'icône doit être au format hexadécimal (#RRGGBB)');
       }
       if (config.bg_start && !/^#[0-9a-fA-F]{6}$/.test(config.bg_start)) {
+        console.error('[HA Room Card Editor] BG start color validation failed:', config.bg_start);
         throw new Error('La couleur de fond de départ doit être au format hexadécimal (#RRGGBB)');
       }
       if (config.bg_end && !/^#[0-9a-fA-F]{6}$/.test(config.bg_end)) {
+        console.error('[HA Room Card Editor] BG end color validation failed:', config.bg_end);
         throw new Error('La couleur de fin de fond doit être au format hexadécimal (#RRGGBB)');
       }
+
+      console.log('[HA Room Card Editor] Config validation successful');
     };
 
     // Label localization function
@@ -61,7 +71,7 @@ export class HaRoomCardEditor {
       return labels[schema.name] || schema.name;
     };
 
-    return {
+    const formSchema = {
       schema: [
         // Basic configuration
         {
@@ -76,7 +86,7 @@ export class HaRoomCardEditor {
           name: "icon_color",
           selector: { text: {} },
         },
-        
+
         // Appearance section
         {
           type: "expandable",
@@ -93,7 +103,7 @@ export class HaRoomCardEditor {
             },
           ],
         },
-        
+
         // Sensors section
         {
           type: "expandable",
@@ -102,23 +112,23 @@ export class HaRoomCardEditor {
           schema: [
             {
               name: "temp_entity",
-              selector: { 
-                entity: { 
-                  domain: ["sensor", "climate"] 
-                } 
+              selector: {
+                entity: {
+                  domain: ["sensor", "climate"]
+                }
               },
             },
             {
               name: "hum_entity",
-              selector: { 
-                entity: { 
-                  domain: ["sensor"] 
-                } 
+              selector: {
+                entity: {
+                  domain: ["sensor"]
+                }
               },
             },
           ],
         },
-        
+
         // Entity lists section
         {
           type: "expandable",
@@ -127,43 +137,43 @@ export class HaRoomCardEditor {
           schema: [
             {
               name: "power_list",
-              selector: { 
-                entity: { 
+              selector: {
+                entity: {
                   domain: ["sensor"],
                   multiple: true
-                } 
+                }
               },
             },
             {
               name: "light_list",
-              selector: { 
-                entity: { 
+              selector: {
+                entity: {
                   domain: ["light"],
                   multiple: true
-                } 
+                }
               },
             },
             {
               name: "presence_list",
-              selector: { 
-                entity: { 
+              selector: {
+                entity: {
                   domain: ["binary_sensor", "device_tracker"],
                   multiple: true
-                } 
+                }
               },
             },
             {
               name: "open_list",
-              selector: { 
-                entity: { 
+              selector: {
+                entity: {
                   domain: ["binary_sensor"],
                   multiple: true
-                } 
+                }
               },
             },
           ],
         },
-        
+
         // Navigation hashes section
         {
           type: "expandable",
@@ -204,7 +214,7 @@ export class HaRoomCardEditor {
             },
           ],
         },
-        
+
         // Media entities section
         {
           type: "expandable",
@@ -213,23 +223,23 @@ export class HaRoomCardEditor {
           schema: [
             {
               name: "audio_cover_entity",
-              selector: { 
-                entity: { 
-                  domain: ["media_player"] 
-                } 
+              selector: {
+                entity: {
+                  domain: ["media_player"]
+                }
               },
             },
             {
               name: "video_cover_entity",
-              selector: { 
-                entity: { 
-                  domain: ["media_player"] 
-                } 
+              selector: {
+                entity: {
+                  domain: ["media_player"]
+                }
               },
             },
           ],
         },
-        
+
         // Labels and customization section
         {
           type: "expandable",
@@ -242,7 +252,7 @@ export class HaRoomCardEditor {
             },
             {
               name: "features",
-              selector: { 
+              selector: {
                 select: {
                   options: [
                     { value: "full_card_actions", label: "Actions sur toute la carte" },
@@ -250,12 +260,12 @@ export class HaRoomCardEditor {
                     { value: "adaptive_themes", label: "Thèmes adaptatifs" },
                   ],
                   multiple: true,
-                } 
+                }
               },
             },
           ],
         },
-        
+
         // Actions section
         {
           type: "expandable",
@@ -280,13 +290,17 @@ export class HaRoomCardEditor {
       assertConfig,
       computeLabel,
     };
+
+    console.log('[HA Room Card Editor] Form schema created:', formSchema);
+    return formSchema;
   }
 
   /**
    * Get default configuration for new card instances
    */
   static getStubConfig() {
-    return {
+    console.log('[HA Room Card Editor] Getting stub config...');
+    const stubConfig = {
       type: "ha-room-card",
       name: 'Salon',
       icon: 'mdi:home',
@@ -300,5 +314,7 @@ export class HaRoomCardEditor {
       presence_list: ['binary_sensor.motion'],
       open_list: ['binary_sensor.door', 'binary_sensor.window'],
     };
+    console.log('[HA Room Card Editor] Stub config created:', stubConfig);
+    return stubConfig;
   }
 }

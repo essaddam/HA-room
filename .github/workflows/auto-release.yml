@@ -55,20 +55,27 @@ jobs:
           echo "" >> CHANGELOG_RELEASE.md
           
           if [ -n "$PREV_TAG" ]; then
-            echo "### 🚀 Nouvelles fonctionnalités" >> CHANGELOG_RELEASE.md
-            git log --pretty=format:"- %s" $PREV_TAG..HEAD | grep -E "^feat|^feature" | sed 's/^[a-z]*: /- /' | head -10 >> CHANGELOG_RELEASE.md || echo "- Aucune nouvelle fonctionnalité" >> CHANGELOG_RELEASE.md
-            echo "" >> CHANGELOG_RELEASE.md
-            
-            echo "### 🐛 Corrections" >> CHANGELOG_RELEASE.md
-            git log --pretty=format:"- %s" $PREV_TAG..HEAD | grep -E "^fix" | sed 's/^[a-z]*: /- /' | head -10 >> CHANGELOG_RELEASE.md || echo "- Aucune correction" >> CHANGELOG_RELEASE.md
-            echo "" >> CHANGELOG_RELEASE.md
-            
-            echo "### 🔧 Améliorations" >> CHANGELOG_RELEASE.md
-            git log --pretty=format:"- %s" $PREV_TAG..HEAD | grep -E "^chore|^refactor|^perf" | sed 's/^[a-z]*: /- /' | head -5 >> CHANGELOG_RELEASE.md || echo "- Aucune amélioration" >> CHANGELOG_RELEASE.md
+            echo "### 📝 Derniers changements" >> CHANGELOG_RELEASE.md
+            git log --pretty=format:"- %s" $PREV_TAG..HEAD | head -10 >> CHANGELOG_RELEASE.md
           else
-            echo "### 🎉 Première release" >> CHANGELOG_RELEASE.md
-            echo "- Version initiale avec toutes les fonctionnalités" >> CHANGELOG_RELEASE.md
+            echo "### 🎉 Release initiale" >> CHANGELOG_RELEASE.md
+            echo "- Première version avec toutes les fonctionnalités" >> CHANGELOG_RELEASE.md
           fi
+          
+          echo "" >> CHANGELOG_RELEASE.md
+          echo "### 🚀 Fonctionnalités principales" >> CHANGELOG_RELEASE.md
+          echo "- 🏠 Carte de pièce moderne avec design personnalisable" >> CHANGELOG_RELEASE.md
+          echo "- 🌡️ Support des capteurs climatiques (température, humidité)" >> CHANGELOG_RELEASE.md
+          echo "- ⚡ Surveillance de la consommation électrique en temps réel" >> CHANGELOG_RELEASE.md
+          echo "- 👥 Détection de présence avec indicateurs animés" >> CHANGELOG_RELEASE.md
+          echo "- 💡 Contrôle des lumières avec réglage de luminosité" >> CHANGELOG_RELEASE.md
+          echo "- 🔌 Gestion des prises et appareils électriques" >> CHANGELOG_RELEASE.md
+          
+          echo "" >> CHANGELOG_RELEASE.md
+          echo "### 🐛 Corrections et améliorations" >> CHANGELOG_RELEASE.md
+          echo "- Correction du schemaURL pour la compatibilité HACS" >> CHANGELOG_RELEASE.md
+          echo "- Ajout de logs de débogage détaillés" >> CHANGELOG_RELEASE.md
+          echo "- Amélioration de la configuration de build" >> CHANGELOG_RELEASE.md
           
           echo "" >> CHANGELOG_RELEASE.md
           echo "---" >> CHANGELOG_RELEASE.md
