@@ -116,14 +116,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add dist/
-          git commit -m "🚀 Auto-update dist folder [skip ci]
-
-📦 Built files:
-- ha-room-card.js (main card)
-- ha-room-card-schema.json (editor schema)
-- Component definitions and types
-
-🔄 Auto-generated on: $(date)"
+          git commit -m "🚀 Auto-update dist folder [skip ci]\n\n📦 Built files:\n- ha-room-card.js (main card)\n- ha-room-card-schema.json (editor schema)\n- Component definitions and types\n\n🔄 Auto-generated on: $(date)"
           git push
 
   # Auto-tag on version change
