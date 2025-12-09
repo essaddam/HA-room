@@ -40,8 +40,15 @@ try {
   let versionType = null;
 
   if (commitMessage.startsWith('feat:') || commitMessage.startsWith('feature:')) {
-    versionType = 'minor';
-    newVersion = incrementVersion(currentVersion, 'minor');
+    // Pour les vraies fonctionnalités, incrémenter en minor
+    // Mais si le message contient "test", utiliser patch à la place
+    if (commitMessage.includes('test')) {
+      versionType = 'patch';
+      newVersion = incrementVersion(currentVersion, 'patch');
+    } else {
+      versionType = 'minor';
+      newVersion = incrementVersion(currentVersion, 'minor');
+    }
   } else if (commitMessage.startsWith('fix:') || commitMessage.startsWith('fix:')) {
     versionType = 'patch';
     newVersion = incrementVersion(currentVersion, 'patch');
