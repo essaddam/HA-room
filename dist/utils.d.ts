@@ -16,4 +16,11 @@ export declare function formatHumidity(value: number): string;
 export declare function formatPower(value: number): string;
 export declare function getDomain(entityId: string): string;
 export declare function isValidEntityId(entityId: string): boolean;
+interface RegisterCardParams {
+    type: string;
+    name: string;
+    description: string;
+}
+export declare function registerCustomCard(params: RegisterCardParams): void;
+export {};
 //# sourceMappingURL=utils.d.ts.map

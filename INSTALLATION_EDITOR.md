@@ -2,7 +2,24 @@
 
 ## Étapes d'installation
 
-### 1. Installation des fichiers
+### 1. Installation via HACS
+
+1. **Ajoutez le dépôt HACS :**
+   - Allez dans HACS > Intégrations
+   - Cliquez sur les 3 points > Explore & Download Repositories
+   - Cherchez `ha-room-card`
+   - Installez-le
+
+2. **Ajoutez la ressource à votre configuration Lovelace :**
+   ```yaml
+   resources:
+     - type: module
+       url: /hacsfiles/ha-room-card/dist/ha-room-card.js
+   ```
+
+### 2. Installation manuelle (alternative)
+
+Si vous préférez une installation manuelle :
 
 1. Copiez le contenu du dossier `dist` dans votre configuration Home Assistant :
    ```
@@ -16,7 +33,7 @@
        type: module
    ```
 
-### 2. Utilisation de l'éditeur visuel
+### 3. Utilisation de l'éditeur visuel
 
 1. Allez dans votre dashboard Home Assistant
 2. Cliquez sur "Modifier le tableau de bord"
@@ -35,13 +52,13 @@
 - **Personnalisation** : Options avancées et fonctionnalités
 - **Actions** : Actions au clic, maintien, double-clic
 
-### 3. Configuration minimale
+### 4. Configuration minimale
 
 Pour commencer, vous n'avez besoin que de :
 - Un nom pour la pièce
 - Au moins une entité (lumière, capteur, etc.)
 
-### 4. Exemple de configuration
+### 5. Exemple de configuration
 
 L'éditeur visuel générera automatiquement le YAML correspondant. Voici un exemple :
 
@@ -58,16 +75,23 @@ presence_list:
   - binary_sensor.salon_mouvement
 ```
 
-### 5. Dépannage
+### 6. Dépannage
 
 Si l'éditeur visuel ne s'affiche pas :
 
+**Pour installation HACS :**
+1. Vérifiez que le dépôt est bien installé via HACS
+2. Vérifiez l'URL dans les ressources : `/hacsfiles/ha-room-card/dist/ha-room-card.js`
+3. Redémarrez Home Assistant
+4. Videz le cache de votre navigateur
+
+**Pour installation manuelle :**
 1. Vérifiez que les fichiers sont bien dans `/config/www/community/ha-room-card/`
 2. Vérifiez l'URL dans les ressources : `/local/community/ha-room-card/ha-room-card.js`
 3. Redémarrez Home Assistant
 4. Videz le cache de votre navigateur
 
-### 6. Fonctionnalités avancées
+### 7. Fonctionnalités avancées
 
 L'éditeur visuel supporte également :
 - Sélection multiple d'entités
@@ -78,6 +102,18 @@ L'éditeur visuel supporte également :
 
 ## Mise à jour
 
-Pour mettre à jour l'éditeur visuel :
+**Pour installation HACS :**
+1. Allez dans HACS > Intégrations
+2. Cherchez `ha-room-card`
+3. Cliquez sur "Mettre à jour"
+4. Rechargez votre dashboard
+
+**Pour installation manuelle :**
 1. Remplacez les fichiers dans `/config/www/community/ha-room-card/`
 2. Rechargez votre dashboard (pas besoin de redémarrer HA)
+
+## Notes importantes
+
+- Le fichier `dist/ha-room-card.js` est généré par `npm run build`
+- Assurez-vous d'utiliser la version la plus récente pour bénéficier de toutes les fonctionnalités
+- L'éditeur visuel nécessite Home Assistant 2025.12+

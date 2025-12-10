@@ -152,6 +152,14 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Commit and push dist files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add dist/
+          git commit -m "🚀 Auto-update dist folder [skip ci]" || exit 0
+          git push
+
   verify-pr-dist:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'

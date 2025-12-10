@@ -3,7 +3,7 @@
   "type": "object",
   "name": "HA Room Card",
   "description": "Custom room card with modern design and interactive features",
-  "version": "1.46.33",
+  "version": "1.0.0",
   "properties": {
     "type": {
       "type": "string",
@@ -52,10 +52,7 @@
       "description": "Entité du capteur de température",
       "selector": {
         "entity": {
-          "domain": [
-            "sensor",
-            "climate"
-          ]
+          "domain": ["sensor", "climate"]
         }
       }
     },
@@ -65,9 +62,7 @@
       "description": "Entité du capteur d'humidité",
       "selector": {
         "entity": {
-          "domain": [
-            "sensor"
-          ]
+          "domain": ["sensor"]
         }
       }
     },
@@ -79,9 +74,7 @@
         "type": "string",
         "selector": {
           "entity": {
-            "domain": [
-              "sensor"
-            ]
+            "domain": ["sensor"]
           }
         }
       },
@@ -95,9 +88,7 @@
         "type": "string",
         "selector": {
           "entity": {
-            "domain": [
-              "light"
-            ]
+            "domain": ["light"]
           }
         }
       },
@@ -111,10 +102,7 @@
         "type": "string",
         "selector": {
           "entity": {
-            "domain": [
-              "binary_sensor",
-              "device_tracker"
-            ]
+            "domain": ["binary_sensor", "device_tracker"]
           }
         }
       },
@@ -128,9 +116,7 @@
         "type": "string",
         "selector": {
           "entity": {
-            "domain": [
-              "binary_sensor"
-            ]
+            "domain": ["binary_sensor"]
           }
         }
       },
@@ -190,9 +176,7 @@
       "description": "Entité pour l'affichage de la pochette audio",
       "selector": {
         "entity": {
-          "domain": [
-            "media_player"
-          ]
+          "domain": ["media_player"]
         }
       }
     },
@@ -202,9 +186,7 @@
       "description": "Entité pour l'affichage de la pochette vidéo",
       "selector": {
         "entity": {
-          "domain": [
-            "media_player"
-          ]
+          "domain": ["media_player"]
         }
       }
     },
@@ -249,12 +231,7 @@
             "$ref": "#/definitions/action"
           }
         },
-        "required": [
-          "type",
-          "icon",
-          "icon_color",
-          "content"
-        ]
+        "required": ["type", "icon", "icon_color", "content"]
       },
       "default": []
     },
@@ -264,11 +241,7 @@
       "description": "Options expérimentales pour HA 2025.12+",
       "items": {
         "type": "string",
-        "enum": [
-          "full_card_actions",
-          "enhanced_animations",
-          "adaptive_themes"
-        ]
+        "enum": ["full_card_actions", "enhanced_animations", "adaptive_themes"]
       },
       "default": []
     },
@@ -288,21 +261,14 @@
       "description": "Action lors du double-clic sur la carte"
     }
   },
-  "required": [
-    "type"
-  ],
+  "required": ["type"],
   "definitions": {
     "action": {
       "type": "object",
       "properties": {
         "action": {
           "type": "string",
-          "enum": [
-            "more-info",
-            "navigate",
-            "call-service",
-            "none"
-          ],
+          "enum": ["more-info", "navigate", "call-service", "none"],
           "title": "Type d'action"
         },
         "navigation_path": {

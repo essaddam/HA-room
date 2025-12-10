@@ -1,8 +1,8 @@
 # Installation HACS (Mode Source)
 
-## Configuration pour HACS avec fichiers source
+## Configuration pour HACS avec fichiers build
 
-Le projet est maintenant configuré pour fonctionner directement avec les fichiers TypeScript source, sans nécessiter de build.
+Le projet utilise les fichiers build générés dans le répertoire `dist/` pour un fonctionnement optimal avec HACS.
 
 ### 1. Installation via HACS
 
@@ -19,7 +19,7 @@ Le projet est maintenant configuré pour fonctionner directement avec les fichie
    ```yaml
    resources:
      - type: module
-       url: /hacsfiles/ha-room-card/src/ha-room-card.ts
+       url: /hacsfiles/ha-room-card/dist/ha-room-card.js
    ```
 
 3. **Utilisation dans les cartes :**
@@ -33,25 +33,29 @@ Le projet est maintenant configuré pour fonctionner directement avec les fichie
    # ... autres configurations
    ```
 
-### 2. Avantages du mode source
+### 2. Avantages du mode build
 
-✅ **Développement rapide** : Modifications immédiatement visibles  
-✅ **Pas de build nécessaire** : Travaillez directement avec les fichiers source  
-✅ **Débogage facile** : Accès direct au code TypeScript  
-✅ **Mises à jour simples** : Un git pull suffit  
+✅ **Performance optimale** : Fichiers JavaScript optimisés
+✅ **Compatibilité garantie** : Tous les navigateurs modernes supportés
+✅ **Taille réduite** : Code minifié pour un chargement rapide
+✅ **Stabilité** : Version testée et validée
 
 ### 3. Structure des fichiers
 
 ```
 /config/community/ha-room-card/
-├── src/
+├── dist/
+│   ├── ha-room-card.js           # Carte principale (build)
+│   ├── ha-room-card-editor.js    # Éditeur visuel (build)
+│   ├── components/               # Composants popup (build)
+│   └── ha-room-card-schema.json  # Schéma JSON pour l'éditeur
+├── src/                          # Fichiers source (pour développement)
 │   ├── ha-room-card.ts           # Carte principale
 │   ├── ha-room-card-editor.ts    # Éditeur visuel
 │   ├── components/               # Composants popup
 │   ├── const.ts                 # Constantes
 │   ├── types.ts                 # Types TypeScript
 │   └── utils.ts                 # Utilitaires
-├── ha-room-card-schema.json      # Schéma JSON pour l'éditeur
 └── README.md                    # Documentation
 ```
 
@@ -64,7 +68,13 @@ Pour développer localement :
 cd /config/community/ha-room-card/
 git clone <votre-repo-url> .
 
-# Les modifications sont immédiatement disponibles
+# Installez les dépendances et générez le build
+npm install
+npm run build
+
+# Les modifications nécessitent un nouveau build
+npm run build  # après chaque modification des fichiers source
+
 # Rechargez votre page Home Assistant pour voir les changements
 ```
 
@@ -87,13 +97,11 @@ Pour vérifier que l'éditeur fonctionne :
 
 Les fichiers suivants sont inclus dans la distribution HACS :
 
-- `src/ha-room-card.ts` - Carte principale
-- `src/ha-room-card-editor.ts` - Éditeur visuel
-- `src/components/` - Tous les composants popup
-- `src/const.ts` - Constantes partagées
-- `src/types.ts` - Définitions de types
-- `src/utils.ts` - Fonctions utilitaires
-- `ha-room-card-schema.json` - Schéma JSON de validation
+- `dist/ha-room-card.js` - Carte principale (build)
+- `dist/ha-room-card-editor.js` - Éditeur visuel (build)
+- `dist/components/` - Tous les composants popup (build)
+- `dist/ha-room-card-schema.json` - Schéma JSON de validation
+- `src/` - Fichiers source (référence pour le développement)
 
 ### 7. Compatibilité
 
@@ -101,4 +109,4 @@ Les fichiers suivants sont inclus dans la distribution HACS :
 - **Navigateurs** : Modernes supportant ES modules
 - **HACS** : Version compatible avec les fichiers source
 
-Cette configuration permet un développement plus rapide et une maintenance simplifiée tout en conservant toutes les fonctionnalités de l'éditeur visuel.
+Cette configuration assure une performance optimale et une compatibilité maximale tout en conservant toutes les fonctionnalités de l'éditeur visuel.
