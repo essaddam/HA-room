@@ -23,8 +23,7 @@ export default {
   output: {
     file: 'dist/ha-room-card.js',
     format: 'es',
-    sourcemap: true,
-    sourcemapFile: 'dist/ha-room-card.js.map',
+    sourcemap: 'inline',
   },
   plugins: [
     nodeResolve(),
