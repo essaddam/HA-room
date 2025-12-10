@@ -32,7 +32,7 @@ const cardConfig = {
   description: 'Custom room card with modern design and interactive features',
   preview: true,
   documentationURL: 'https://github.com/essaddam/HA-room#readme',
-  schemaURL: '/hacsfiles/ha-room-card/dist/ha-room-card-schema.json',
+  schemaURL: '/hacsfiles/ha-room/ha-room-card-schema.json',
 };
 console.log('[HA Room Card] Card config:', cardConfig);
 (window as any).customCards.push(cardConfig);
