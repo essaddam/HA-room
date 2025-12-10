@@ -1,6 +1,6 @@
 {
   "name": "ha-room-card",
-  "version": "1.46.26",
+  "version": "1.46.27",
   "description": "Custom room card for Home Assistant with modern design and interactive features",
   "type": "module",
   "main": "dist/ha-room-card.js",
