@@ -24,6 +24,7 @@ export default {
     file: 'dist/ha-room-card.js',
     format: 'es',
     sourcemap: 'inline',
+    inlineDynamicImports: true,
   },
   plugins: [
     nodeResolve(),

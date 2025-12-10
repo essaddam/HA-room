@@ -1,7 +1,7 @@
 import { LitElement, html, css, TemplateResult, nothing } from 'lit';
-import { property, state } from 'lit/decorators.js';
-import { HomeAssistant } from 'custom-card-helpers';
-import { CARD_VERSION, CARD_NAME, DEFAULT_CONFIG } from './const.js';
+import { property, state, customElement } from 'lit/decorators.js';
+import { HomeAssistant, LovelaceCardEditor } from 'custom-card-helpers';
+import { CARD_VERSION, CARD_NAME, CARD_EDITOR_NAME, DEFAULT_CONFIG } from './const.js';
 import { HaRoomCardConfig, RoomCardData } from './types.js';
 import {
   computeEntityState,
@@ -12,7 +12,7 @@ import {
   formatHumidity,
   formatPower,
 } from './utils.js';
-import { HaRoomCardEditor } from './ha-room-card-editor.js';
+
 
 console.info(
   `%c ${CARD_NAME} %c ${CARD_VERSION}`,
@@ -93,6 +93,7 @@ window.addEventListener('DOMContentLoaded', () => {
 // Note: Validation will be performed after DOM is fully loaded
 // This ensures the @customElement decorator has completed registration
 
+@customElement(CARD_NAME)
 export class HaRoomCard extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
   @property({ attribute: false }) public config!: HaRoomCardConfig;
@@ -862,12 +863,24 @@ export class HaRoomCard extends LitElement {
     `;
   }
 
-  static getConfigForm() {
-    return HaRoomCardEditor.getConfigForm();
+  public static async getConfigElement(): Promise<LovelaceCardEditor> {
+    await import('./ha-room-card-editor.js');
+    return document.createElement(CARD_EDITOR_NAME) as LovelaceCardEditor;
   }
 
   static getStubConfig() {
-    return HaRoomCardEditor.getStubConfig();
+    return {
+      type: `custom:${CARD_NAME}`,
+      name: 'Salon',
+      icon: 'mdi:home',
+      icon_color: '#ffffff',
+      bg_start: '#667eea',
+      bg_end: '#764ba2',
+      power_list: [],
+      light_list: [],
+      presence_list: [],
+      open_list: [],
+    };
   }
 
   // Grid options for Sections view (Home Assistant 2025.12+)
@@ -886,27 +899,3 @@ export class HaRoomCard extends LitElement {
   }
 }
 
-// Force manual registration of the custom element after class definition
-console.log(`[HA Room Card] Attempting to register custom element '${CARD_NAME}'...`);
-
-try {
-  // Check if already registered
-  if (!customElements.get(CARD_NAME)) {
-    console.log(`[HA Room Card] Registering custom element '${CARD_NAME}' manually...`);
-    customElements.define(CARD_NAME, HaRoomCard);
-    console.log(`[HA Room Card] ✅ Custom element '${CARD_NAME}' registered successfully`);
-    
-    // Verify registration immediately
-    if (customElements.get(CARD_NAME)) {
-      console.log(`[HA Room Card] ✅ Registration verified for '${CARD_NAME}'`);
-    } else {
-      console.error(`[HA Room Card] ❌ Registration verification failed for '${CARD_NAME}'`);
-    }
-  } else {
-    console.log(`[HA Room Card] ℹ️ Custom element '${CARD_NAME}' already registered`);
-  }
-} catch (error) {
-  console.error(`[HA Room Card] ❌ Failed to register custom element '${CARD_NAME}':`, error);
-  // Don't throw error to prevent breaking the entire card loading
-  console.warn(`[HA Room Card] Continuing despite registration error`);
-}

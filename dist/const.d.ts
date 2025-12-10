@@ -1,5 +1,6 @@
 export declare const CARD_VERSION = "1.46.30";
 export declare const CARD_NAME = "ha-room-card";
+export declare const CARD_EDITOR_NAME = "ha-room-card-editor";
 export declare const DEFAULT_CONFIG: {
     name: string;
     icon: string;

@@ -1,5 +1,5 @@
 import { LitElement, TemplateResult } from 'lit';
-import { HomeAssistant } from 'custom-card-helpers';
+import { HomeAssistant, LovelaceCardEditor } from 'custom-card-helpers';
 import { HaRoomCardConfig } from './types.js';
 export declare class HaRoomCard extends LitElement {
     hass: HomeAssistant;
@@ -27,111 +27,7 @@ export declare class HaRoomCard extends LitElement {
     private _renderVideoButton;
     private _renderCamerasButton;
     protected render(): TemplateResult;
-    static getConfigForm(): {
-        schema: ({
-            name: string;
-            selector: {
-                text: {};
-                icon?: undefined;
-            };
-            type?: undefined;
-            label?: undefined;
-            icon?: undefined;
-            schema?: undefined;
-        } | {
-            name: string;
-            selector: {
-                icon: {};
-                text?: undefined;
-            };
-            type?: undefined;
-            label?: undefined;
-            icon?: undefined;
-            schema?: undefined;
-        } | {
-            type: string;
-            label: string;
-            icon: string;
-            schema: {
-                name: string;
-                selector: {
-                    color: {};
-                };
-            }[];
-            name?: undefined;
-            selector?: undefined;
-        } | {
-            type: string;
-            label: string;
-            icon: string;
-            schema: {
-                name: string;
-                selector: {
-                    entity: {
-                        domain: string[];
-                    };
-                };
-            }[];
-            name?: undefined;
-            selector?: undefined;
-        } | {
-            type: string;
-            label: string;
-            icon: string;
-            schema: {
-                name: string;
-                selector: {
-                    entity: {
-                        domain: string[];
-                        multiple: boolean;
-                    };
-                };
-            }[];
-            name?: undefined;
-            selector?: undefined;
-        } | {
-            type: string;
-            label: string;
-            icon: string;
-            schema: ({
-                name: string;
-                selector: {
-                    text: {};
-                    select?: undefined;
-                };
-            } | {
-                name: string;
-                selector: {
-                    select: {
-                        options: {
-                            value: string;
-                            label: string;
-                        }[];
-                        multiple: boolean;
-                    };
-                    text?: undefined;
-                };
-            })[];
-            name?: undefined;
-            selector?: undefined;
-        } | {
-            type: string;
-            label: string;
-            icon: string;
-            schema: {
-                name: string;
-                selector: {
-                    action: {};
-                };
-            }[];
-            name?: undefined;
-            selector?: undefined;
-        })[];
-        assertConfig: (config: HaRoomCardConfig) => void;
-        computeLabel: (schema: {
-            name: string;
-        }) => string;
-    };
+    static getConfigElement(): Promise<LovelaceCardEditor>;
     static getStubConfig(): {
         type: string;
         name: string;
