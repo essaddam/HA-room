@@ -71,6 +71,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Configure Git identity
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          echo "✅ Git identity configured"
+
       - name: Compute version from tags and update files
         id: version
         run: |
@@ -85,8 +91,8 @@ jobs:
           # Vérifier si le script a réussi malgré le code de sortie
           if [[ $EXIT_CODE -eq 0 ]] || echo "$OUTPUT" | grep -q "📤 VERSION="; then
             # Extraire la version et le tag des sorties
-            VERSION=$(echo "$OUTPUT" | grep "📤 VERSION=" | cut -d'=' -f2)
-            TAG=$(echo "$OUTPUT" | grep "📤 TAG=" | cut -d'=' -f2)
+            VERSION=$(echo "$OUTPUT" | grep "📤 VERSION=" | cut -d'=' -f2 | tr -d ' ')
+            TAG=$(echo "$OUTPUT" | grep "📤 TAG=" | cut -d'=' -f2 | tr -d ' ')
             
             if [[ -n "$VERSION" && -n "$TAG" ]]; then
               echo "version=$VERSION" >> $GITHUB_OUTPUT
@@ -95,6 +101,8 @@ jobs:
               echo "✅ Tag: $TAG"
             else
               echo "❌ Impossible d'extraire version/tag"
+              echo "VERSION: '$VERSION'"
+              echo "TAG: '$TAG'"
               exit 1
             fi
           else
@@ -105,12 +113,19 @@ jobs:
 
       - name: Push version bump and tags
         run: |
-          git config user.name "GitHub Action"
-          git config user.email "action@github.com"
-          git add .
-          git commit -m "🔖 Bump version to ${{ steps.version.outputs.version }} [skip ci]" || true
-          git push origin HEAD
-          git push origin --tags
+          # Vérifier s'il y a des changements à commiter
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo "📝 Changes detected, committing..."
+            git add .
+            git commit -m "🔖 Bump version to ${{ steps.version.outputs.version }} [skip ci]"
+            echo "✅ Changes committed"
+          else
+            echo "ℹ️  No changes to commit"
+          fi
+          
+          # Push des commits et des tags
+          git push origin HEAD --follow-tags
+          echo "✅ Pushed to origin with tags"
 
   update-dist:
     runs-on: ubuntu-latest

@@ -49,7 +49,7 @@ try {
   // Récupérer tous les tags triés par version (du plus récent au plus ancien)
   const tagsOutput = execSync('git tag --sort=-version:refname', { encoding: 'utf8' }).trim();
   const tags = tagsOutput.split('\n').filter(tag => tag.trim());
-  
+
   console.log(`📋 ${tags.length} tags trouvés`);
 
   // Trouver la dernière version valide
@@ -76,12 +76,12 @@ try {
   const packagePath = path.join(process.cwd(), 'package.json');
   const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
   const currentVersion = packageJson.version;
-  
+
   console.log(`📦 Version actuelle dans package.json: ${currentVersion}`);
 
   // Comparer les versions
   const currentParsed = extractVersionFromTag(`v${currentVersion}`);
-  
+
   let newVersion;
   let versionType = 'patch'; // par défaut
 
@@ -90,7 +90,7 @@ try {
   try {
     commitMessage = execSync('git log -1 --pretty=%B', { encoding: 'utf8' }).trim();
     console.log(`📝 Dernier commit: ${commitMessage.substring(0, 50)}...`);
-    
+
     if (commitMessage.startsWith('feat:') || commitMessage.startsWith('feature:')) {
       versionType = 'minor';
     } else if (commitMessage.startsWith('BREAKING CHANGE:') || commitMessage.includes('!:')) {
@@ -125,6 +125,15 @@ try {
   if (process.argv.includes('--tag')) {
     const tag = `v${newVersion}`;
     try {
+      // Configurer l'identité Git pour les runners
+      try {
+        execSync('git config user.name', { stdio: 'pipe' });
+      } catch (e) {
+        execSync('git config user.name "GitHub Action"', { stdio: 'pipe' });
+        execSync('git config user.email "action@github.com"', { stdio: 'pipe' });
+        console.log('🔧 Configuration Git: user.name et user.email');
+      }
+
       // Vérifier si le tag existe déjà
       execSync(`git rev-parse ${tag}`, { stdio: 'pipe' });
       console.log(`ℹ️  Tag ${tag} existe déjà`);
@@ -150,45 +159,66 @@ function updateVersionInFiles(newVersion) {
     'README.md',
     'CHANGELOG.md',
     'hacs.json',
-    'hacs-repository-info.json'
+    'hacs-repository-info.json',
+    'package.json', // déjà mis à jour mais vérification
+    'dist/ha-room-card.js', // si présent
+    'dist/ha-room-card-schema.json' // si présent
   ];
 
   filesToUpdate.forEach(file => {
     try {
       if (fs.existsSync(file)) {
         let content = fs.readFileSync(file, 'utf8');
+        let modified = false;
 
         // Remplacer les versions dans différents formats
-        content = content.replace(
-          /CARD_VERSION = ['"`]([^'"`]+)['"`]/g,
-          `CARD_VERSION = '${newVersion}'`
-        );
+        const cardVersionRegex = /CARD_VERSION = ['"`]([^'"`]+)['"`]/g;
+        if (cardVersionRegex.test(content)) {
+          content = content.replace(cardVersionRegex, `CARD_VERSION = '${newVersion}'`);
+          modified = true;
+        }
 
-        content = content.replace(
-          /version: ['"`]([^'"`]+)['"`]/g,
-          `version: "${newVersion}"`
-        );
+        const versionRegex = /version: ['"`]([^'"`]+)['"`]/g;
+        if (versionRegex.test(content)) {
+          content = content.replace(versionRegex, `version: "${newVersion}"`);
+          modified = true;
+        }
 
         // Pour les fichiers JSON
         if (file.endsWith('.json')) {
           try {
             const jsonData = JSON.parse(content);
-            if (jsonData.version !== undefined) {
+            if (jsonData.version !== undefined && jsonData.version !== newVersion) {
               jsonData.version = newVersion;
-              content = JSON.stringify(jsonData, null, 2);
+              content = JSON.stringify(jsonData, null, 2) + '\n';
+              modified = true;
             }
           } catch (e) {
             // Ignorer les erreurs de parsing JSON
           }
         }
 
-        content = content.replace(
-          /## \[v?(\d+\.\d+\.\d+)\]/g,
-          `## [v${newVersion}]`
-        );
+        // Pour les changelogs
+        const changelogRegex = /## \[v?(\d+\.\d+\.\d+)\]/g;
+        if (changelogRegex.test(content)) {
+          content = content.replace(changelogRegex, `## [v${newVersion}]`);
+          modified = true;
+        }
 
-        fs.writeFileSync(file, content);
-        console.log(`📄 ${file} mis à jour`);
+        // Pour les fichiers JavaScript (dist)
+        if (file.endsWith('.js')) {
+          const jsVersionRegex = /const CARD_VERSION = ['"`]([^'"`]+)['"`]/g;
+          if (jsVersionRegex.test(content)) {
+            content = content.replace(jsVersionRegex, `const CARD_VERSION = '${newVersion}'`);
+            modified = true;
+          }
+        }
+
+        // Écrire le fichier seulement si modifié
+        if (modified) {
+          fs.writeFileSync(file, content);
+          console.log(`📄 ${file} mis à jour`);
+        }
       }
     } catch (error) {
       console.log(`⚠️  Impossible de mettre à jour ${file} : ${error.message}`);
