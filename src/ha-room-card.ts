@@ -36,7 +36,7 @@ console.log(`[HA Room Card] Registering custom card with type: custom:${CARD_NAM
 console.log(`[HA Room Card] CARD_NAME value: ${CARD_NAME}`);
 console.log(`[HA Room Card] Custom elements defined before registration:`, customElements.get(CARD_NAME));
 
-@customElement(CARD_NAME)
+@customElement(`custom:${CARD_NAME}`)
 export class HaRoomCard extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
   @property({ attribute: false }) public config!: HaRoomCardConfig;
