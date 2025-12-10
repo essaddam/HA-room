@@ -31,7 +31,10 @@ registerCustomCard({
   description: 'Custom room card with modern design and interactive features',
 });
 
-
+// Debug logging to verify registration
+console.log(`[HA Room Card] Registering custom card with type: custom:${CARD_NAME}`);
+console.log(`[HA Room Card] CARD_NAME value: ${CARD_NAME}`);
+console.log(`[HA Room Card] Custom elements defined before registration:`, customElements.get(CARD_NAME));
 
 @customElement(CARD_NAME)
 export class HaRoomCard extends LitElement {
