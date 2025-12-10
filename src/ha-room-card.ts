@@ -104,6 +104,11 @@ export class HaRoomCard extends LitElement {
   constructor() {
     super();
     console.log(`[HA Room Card] Constructor called for element: ${CARD_NAME}`);
+
+    // Ensure the element is properly connected
+    this.updateComplete.then(() => {
+      console.log(`[HA Room Card] Element ${CARD_NAME} is now connected and ready`);
+    });
   }
 
   static get styles() {
@@ -123,9 +128,32 @@ export class HaRoomCard extends LitElement {
 
       .card-header {
         background: transparent;
-        --card-primary-font-size: 20px;
-        --card-primary-font-weight: 650;
         margin-bottom: 12px;
+      }
+
+      .card-title {
+        display: flex;
+        align-items: center;
+        font-size: 20px;
+        font-weight: 650;
+        color: white;
+        margin: 0;
+        padding: 0;
+      }
+
+      .card-title ha-icon {
+        margin-right: 8px;
+        font-size: 24px;
+      }
+
+      .error {
+        color: #ff6b6b;
+        background: rgba(255, 107, 107, 0.1);
+        border: 1px solid rgba(255, 107, 107, 0.3);
+        border-radius: 8px;
+        padding: 12px;
+        text-align: center;
+        font-weight: 500;
       }
 
       .chips-container {
@@ -308,7 +336,8 @@ export class HaRoomCard extends LitElement {
     // Validate custom element registration before setting config
     if (!validateCustomElementRegistration(CARD_NAME)) {
       console.error(`[HA Room Card] setConfig validation failed for element: ${CARD_NAME}`);
-      throw new Error(`Cannot set config: Custom element '${CARD_NAME}' is not properly registered`);
+      // Don't throw error here, just log it to avoid breaking the card loading
+      console.warn(`[HA Room Card] Continuing despite registration validation failure`);
     }
 
     if (!config) {
@@ -321,6 +350,9 @@ export class HaRoomCard extends LitElement {
       ...config,
     };
     console.log('[HA Room Card] Final config:', this.config);
+
+    // Trigger a re-render after config is set
+    this.requestUpdate();
   }
 
   protected willUpdate(changedProperties: Map<string, any>): void {
@@ -764,8 +796,16 @@ export class HaRoomCard extends LitElement {
   }
 
   protected render(): TemplateResult {
-    if (!this.config || !this.hass) {
-      return html`<ha-card>Chargement...</ha-card>`;
+    console.log('[HA Room Card] Render called - config:', !!this.config, 'hass:', !!this.hass);
+
+    if (!this.config) {
+      console.error('[HA Room Card] Missing config in render');
+      return html`<ha-card><div class="error">Configuration manquante</div></ha-card>`;
+    }
+
+    if (!this.hass) {
+      console.error('[HA Room Card] Missing hass in render');
+      return html`<ha-card><div class="error">Home Assistant non disponible</div></ha-card>`;
     }
 
     // Support for Home Assistant 2025.12 theme variables
@@ -790,11 +830,10 @@ export class HaRoomCard extends LitElement {
 
         <!-- Header -->
         <div class="card-header">
-          <ha-card 
-            header=${this.config.name || 'Pièce'}
-            icon=${this.config.icon}
-            icon_color=${this.config.icon_color}
-          ></ha-card>
+          <h1 class="card-title">
+            <ha-icon icon=${this.config.icon || 'mdi:home'}></ha-icon>
+            ${this.config.name || 'Pièce'}
+          </h1>
         </div>
 
         <!-- Chips Row -->
