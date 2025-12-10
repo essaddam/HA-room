@@ -157,3 +157,22 @@ export function getDomain(entityId: string): string {
 export function isValidEntityId(entityId: string): boolean {
   return /^[a-z0-9_]+\.[a-z0-9_]+$/.test(entityId);
 }
+
+interface RegisterCardParams {
+  type: string;
+  name: string;
+  description: string;
+}
+
+export function registerCustomCard(params: RegisterCardParams) {
+  const windowWithCards = window as unknown as Window & {
+    customCards: unknown[];
+  };
+  windowWithCards.customCards = windowWithCards.customCards || [];
+
+  windowWithCards.customCards.push({
+    ...params,
+    preview: true,
+    documentationURL: `https://github.com/essaddam/HA-room#readme`,
+  });
+}
