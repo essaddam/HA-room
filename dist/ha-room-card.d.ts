@@ -5,6 +5,7 @@ export declare class HaRoomCard extends LitElement {
     hass: HomeAssistant;
     config: HaRoomCardConfig;
     private roomData;
+    constructor();
     static get styles(): import("lit").CSSResult;
     setConfig(config: HaRoomCardConfig): void;
     protected willUpdate(changedProperties: Map<string, any>): void;

@@ -25,24 +25,117 @@ console.log('🚀 GitHub Actions workflow test - modification effectuée');
 
 // Register the card for the UI card picker
 console.log('[HA Room Card] Registering custom card...');
-(window as any).customCards = (window as any).customCards || [];
-const cardConfig = {
-  type: `custom:${CARD_NAME}`,
-  name: 'HA Room Card',
-  description: 'Custom room card with modern design and interactive features',
-  preview: true,
-  documentationURL: 'https://github.com/essaddam/HA-room#readme',
-  schemaURL: '/hacsfiles/ha-room/ha-room-card-schema.json',
-};
-console.log('[HA Room Card] Card config:', cardConfig);
-(window as any).customCards.push(cardConfig);
-console.log('[HA Room Card] Custom card registered successfully!');
+try {
+  (window as any).customCards = (window as any).customCards || [];
+  const cardConfig = {
+    type: `custom:${CARD_NAME}`,
+    name: 'HA Room Card',
+    description: 'Custom room card with modern design and interactive features',
+    preview: true,
+    documentationURL: 'https://github.com/essaddam/HA-room#readme',
+    schemaURL: '/hacsfiles/ha-room-card/ha-room-card.js',
+  };
+  console.log('[HA Room Card] Card config:', cardConfig);
+  (window as any).customCards.push(cardConfig);
+  console.log('[HA Room Card] Custom card registered successfully!');
+
+  // Validate registration
+  const registeredCard = (window as any).customCards.find((card: any) => card.type === `custom:${CARD_NAME}`);
+  if (!registeredCard) {
+    console.error('[HA Room Card] Failed to register custom card');
+    throw new Error(`Custom card registration failed for type: custom:${CARD_NAME}`);
+  }
+  console.log('[HA Room Card] Registration validated successfully');
+} catch (error) {
+  console.error('[HA Room Card] Error during custom card registration:', error);
+  throw error;
+}
+
+// Custom element registration validation
+function validateCustomElementRegistration(elementName: string): boolean {
+  try {
+    if (!customElements.get(elementName)) {
+      console.error(`[HA Room Card] Custom element '${elementName}' is not registered`);
+      return false;
+    }
+    console.log(`[HA Room Card] Custom element '${elementName}' is properly registered`);
+    return true;
+  } catch (error) {
+    console.error(`[HA Room Card] Error validating custom element '${elementName}':`, error);
+    return false;
+  }
+}
+
+// Register the custom element with validation
+try {
+  console.log(`[HA Room Card] Registering custom element: ${CARD_NAME}`);
+
+  // Check if already registered
+  if (customElements.get(CARD_NAME)) {
+    console.log(`[HA Room Card] Custom element '${CARD_NAME}' already registered`);
+  } else {
+    console.log(`[HA Room Card] Custom element '${CARD_NAME}' registration successful`);
+  }
+} catch (error) {
+  console.error(`[HA Room Card] Failed to register custom element '${CARD_NAME}':`, error);
+  throw error;
+}
+
+// Global initialization function to ensure proper timing
+window.addEventListener('DOMContentLoaded', () => {
+  console.log('[HA Room Card] DOM loaded - validating registrations');
+
+  // Validate custom card registration
+  const customCardRegistered = (window as any).customCards?.some((card: any) => card.type === `custom:${CARD_NAME}`);
+  if (!customCardRegistered) {
+    console.error('[HA Room Card] Custom card not found in window.customCards after DOM load');
+  } else {
+    console.log('[HA Room Card] Custom card registration confirmed after DOM load');
+  }
+
+  // Validate custom element registration
+  if (!validateCustomElementRegistration(CARD_NAME)) {
+    console.error(`[HA Room Card] Custom element '${CARD_NAME}' not found after DOM load`);
+  } else {
+    console.log(`[HA Room Card] Custom element '${CARD_NAME}' registration confirmed after DOM load`);
+  }
+});
+
+// Also validate immediately for cases where DOM is already loaded
+if (document.readyState === 'loading') {
+  console.log('[HA Room Card] Document still loading - validation scheduled for DOMContentLoaded');
+} else {
+  console.log('[HA Room Card] Document already loaded - validating immediately');
+
+  // Validate custom card registration
+  const customCardRegistered = (window as any).customCards?.some((card: any) => card.type === `custom:${CARD_NAME}`);
+  if (!customCardRegistered) {
+    console.error('[HA Room Card] Custom card not found in window.customCards');
+  } else {
+    console.log('[HA Room Card] Custom card registration confirmed');
+  }
+
+  // Validate custom element registration
+  validateCustomElementRegistration(CARD_NAME);
+}
 
 @customElement(CARD_NAME)
 export class HaRoomCard extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
   @property({ attribute: false }) public config!: HaRoomCardConfig;
   @state() private roomData: RoomCardData = {};
+
+  constructor() {
+    super();
+
+    // Validate custom element registration in constructor
+    if (!validateCustomElementRegistration(CARD_NAME)) {
+      console.error(`[HA Room Card] Constructor validation failed for element: ${CARD_NAME}`);
+      throw new Error(`Custom element '${CARD_NAME}' is not properly registered`);
+    }
+
+    console.log(`[HA Room Card] Constructor validation passed for element: ${CARD_NAME}`);
+  }
 
   static get styles() {
     return css`
@@ -242,6 +335,13 @@ export class HaRoomCard extends LitElement {
 
   public setConfig(config: HaRoomCardConfig): void {
     console.log('[HA Room Card] Setting config:', config);
+
+    // Validate custom element registration before setting config
+    if (!validateCustomElementRegistration(CARD_NAME)) {
+      console.error(`[HA Room Card] setConfig validation failed for element: ${CARD_NAME}`);
+      throw new Error(`Cannot set config: Custom element '${CARD_NAME}' is not properly registered`);
+    }
+
     if (!config) {
       console.error('[HA Room Card] Invalid configuration provided');
       throw new Error('Invalid configuration');
