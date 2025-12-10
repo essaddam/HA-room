@@ -124,8 +124,15 @@ try {
   // Créer le tag si demandé
   if (process.argv.includes('--tag')) {
     const tag = `v${newVersion}`;
-    execSync(`git tag -a ${tag} -m "Release version ${tag}"`, { stdio: 'inherit' });
-    console.log(`🏷️  Tag ${tag} créé`);
+    try {
+      // Vérifier si le tag existe déjà
+      execSync(`git rev-parse ${tag}`, { stdio: 'pipe' });
+      console.log(`ℹ️  Tag ${tag} existe déjà`);
+    } catch (error) {
+      // Le tag n'existe pas, on peut le créer
+      execSync(`git tag -a ${tag} -m "Release version ${tag}"`, { stdio: 'inherit' });
+      console.log(`🏷️  Tag ${tag} créé`);
+    }
   }
 
   // Afficher la nouvelle version pour GitHub Actions
