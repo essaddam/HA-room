@@ -52,6 +52,9 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
       contents: write
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -68,13 +71,29 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Compute version and update files
-        run: node scripts/auto-version.js --tag
+      - name: Compute version from tags and update files
+        id: version
+        run: |
+          # Exécuter le script et capturer les sorties
+          OUTPUT=$(node scripts/auto-version-from-tags.js --tag 2>&1)
+          echo "$OUTPUT"
+          
+          # Extraire la version et le tag des sorties
+          VERSION=$(echo "$OUTPUT" | grep "📤 VERSION=" | cut -d'=' -f2)
+          TAG=$(echo "$OUTPUT" | grep "📤 TAG=" | cut -d'=' -f2)
+          
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          
+          echo "✅ Version calculée: $VERSION"
+          echo "✅ Tag créé: $TAG"
 
       - name: Push version bump and tags
         run: |
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
+          git add .
+          git commit -m "🔖 Bump version to ${{ steps.version.outputs.version }} [skip ci]" || true
           git push origin HEAD
           git push origin --tags
 
@@ -147,52 +166,23 @@ jobs:
 
   auto-tag:
     runs-on: ubuntu-latest
-    needs: update-dist
+    needs: [update-dist, version-bump]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
       contents: write
     outputs:
-      tag: ${{ steps.tag.outputs.value }}
+      tag: ${{ needs.version-bump.outputs.tag }}
+      version: ${{ needs.version-bump.outputs.version }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Read version from package.json
-        id: pkg
+      - name: Tag already created
         run: |
-          VERSION=$(node -p "require('./package.json').version")
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Set tag output
-        id: tag
-        run: |
-          echo "value=v${{ steps.pkg.outputs.version }}" >> $GITHUB_OUTPUT
-
-      - name: Check if tag exists
-        id: check
-        run: |
-          TAG="v${{ steps.pkg.outputs.version }}"
-          if git rev-parse "$TAG" >/dev/null 2>&1; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Create and push tag
-        if: steps.check.outputs.exists == 'false'
-        run: |
-          TAG="v${{ steps.pkg.outputs.version }}"
-          git config user.name "GitHub Action"
-          git config user.email "action@github.com"
-          git tag -a "$TAG" -m "Release version $TAG"
-          git push origin "$TAG"
+          echo "✅ Tag déjà créé: ${{ needs.version-bump.outputs.tag }}"
+          echo "✅ Version: ${{ needs.version-bump.outputs.version }}"
 
   release:
     runs-on: ubuntu-latest
     needs: auto-tag
-    if: needs.auto-tag.outputs.tag != ''
+    if: needs.auto-tag.outputs.tag && needs.auto-tag.outputs.tag != ''
     permissions:
       contents: write
     steps:
@@ -213,30 +203,13 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Check if release exists
-        id: check_release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          TAG="${{ needs.auto-tag.outputs.tag }}"
-          REPO="${{ github.repository }}"
-          status=$(curl -s -H "Authorization: token $GITHUB_TOKEN" -o release.json -w "%{http_code}" "https://api.github.com/repos/$REPO/releases/tags/$TAG")
-          if [ "$status" = "200" ]; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-            node -e "const fs=require('fs'); const j=JSON.parse(fs.readFileSync('release.json','utf8')); if(j.upload_url) console.log('upload_url='+j.upload_url)" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Create Release
-        id: create_release
-        if: steps.check_release.outputs.exists == 'false'
-        uses: actions/create-release@v1
+      - name: Create Release and Upload Assets
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ needs.auto-tag.outputs.tag }}
-          release_name: 🚀 HA Room Card ${{ needs.auto-tag.outputs.tag }}
+          name: 🚀 HA Room Card ${{ needs.auto-tag.outputs.tag }}
           body: |
             Auto-generated release for ${{ needs.auto-tag.outputs.tag }}
             
@@ -246,45 +219,8 @@ jobs:
             - Type definitions
           draft: false
           prerelease: false
-
-      - name: Set upload URL
-        id: set_upload_url
-        run: |
-          if [ "${{ steps.check_release.outputs.exists }}" = "true" ]; then
-            echo "UPLOAD_URL=${{ steps.check_release.outputs.upload_url }}" >> $GITHUB_ENV
-          else
-            echo "UPLOAD_URL=${{ steps.create_release.outputs.upload_url }}" >> $GITHUB_ENV
-          fi
-
-      - name: Upload ha-room-card.js
-        uses: actions/upload-release-asset@v1
-        if: env.UPLOAD_URL != ''
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ env.UPLOAD_URL }}
-          asset_path: dist/ha-room-card.js
-          asset_name: ha-room-card.js
-          asset_content_type: application/javascript
-
-      - name: Upload ha-room-card-schema.json
-        uses: actions/upload-release-asset@v1
-        if: env.UPLOAD_URL != ''
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ env.UPLOAD_URL }}
-          asset_path: dist/ha-room-card-schema.json
-          asset_name: ha-room-card-schema.json
-          asset_content_type: application/json
-
-      - name: Upload type definitions
-        uses: actions/upload-release-asset@v1
-        if: env.UPLOAD_URL != ''
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ env.UPLOAD_URL }}
-          asset_path: dist/ha-room-card.d.ts
-          asset_name: ha-room-card.d.ts
-          asset_content_type: text/plain
+          files: |
+            dist/ha-room-card.js
+            dist/ha-room-card-schema.json
+            dist/ha-room-card.d.ts
+          fail_on_unmatched_files: true
