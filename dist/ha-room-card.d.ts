@@ -8,7 +8,7 @@ export declare class HaRoomCard extends LitElement {
     static get styles(): import("lit").CSSResult;
     setConfig(config: HaRoomCardConfig): void;
     protected shouldUpdate(): boolean;
-    protected willUpdate(): void;
+    protected willUpdate(changedProperties: Map<string, any>): void;
     private _updateRoomData;
     private _handleCardAction;
     private _renderChip;

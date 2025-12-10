@@ -31,7 +31,7 @@ const cardConfig = {
   name: 'HA Room Card',
   description: 'Custom room card with modern design and interactive features',
   preview: true,
-  documentationURL: 'https://github.com/yourusername/ha-room-card#readme',
+  documentationURL: 'https://github.com/essadam/ha-room#readme',
   schemaURL: '/hacsfiles/ha-room-card/ha-room-card-schema.json',
 };
 console.log('[HA Room Card] Card config:', cardConfig);
@@ -255,30 +255,33 @@ export class HaRoomCard extends LitElement {
   }
 
   protected shouldUpdate(): boolean {
-    return true;
+    // Only update if hass or config has changed
+    return !!(this.hass && this.config);
   }
 
-  protected willUpdate(): void {
-    this._updateRoomData();
+  protected willUpdate(changedProperties: Map<string, any>): void {
+    // Only update room data if hass or config has changed
+    if (changedProperties.has('hass') || changedProperties.has('config')) {
+      this._updateRoomData();
+    }
   }
 
   private _updateRoomData(): void {
-    console.log('[HA Room Card] Updating room data...');
+    console.log('[HA Room Card] Updating room data for:', this.config?.name || 'Unknown room');
 
     if (!this.hass || !this.config) {
-      console.error('[HA Room Card] Missing hass or config:', { hass: !!this.hass, config: !!this.config });
+      console.error('[HA Room Card] Missing hass or config');
       return;
     }
 
     const data: RoomCardData = {};
-    console.log('[HA Room Card] Processing entities for room:', this.config.name);
 
     // Temperature
     if (this.config.temp_entity) {
-      console.log('[HA Room Card] Getting temperature for entity:', this.config.temp_entity);
+      console.log('[HA Room Card] Getting temperature for:', this.config.temp_entity);
       try {
         data.temperature = getNumericState(this.hass, this.config.temp_entity);
-        console.log('[HA Room Card] Temperature retrieved:', data.temperature);
+        console.log('[HA Room Card] Temperature:', data.temperature);
       } catch (error) {
         console.error('[HA Room Card] Error getting temperature:', error);
       }
@@ -286,10 +289,10 @@ export class HaRoomCard extends LitElement {
 
     // Humidity
     if (this.config.hum_entity) {
-      console.log('[HA Room Card] Getting humidity for entity:', this.config.hum_entity);
+      console.log('[HA Room Card] Getting humidity for:', this.config.hum_entity);
       try {
         data.humidity = getNumericState(this.hass, this.config.hum_entity);
-        console.log('[HA Room Card] Humidity retrieved:', data.humidity);
+        console.log('[HA Room Card] Humidity:', data.humidity);
       } catch (error) {
         console.error('[HA Room Card] Error getting humidity:', error);
       }
@@ -297,21 +300,21 @@ export class HaRoomCard extends LitElement {
 
     // Power total
     if (this.config.power_list?.length) {
-      console.log('[HA Room Card] Calculating power total for entities:', this.config.power_list);
+      console.log('[HA Room Card] Calculating power for:', this.config.power_list);
       try {
         data.power_total = calculateEntityTotals(this.hass, this.config.power_list);
-        console.log('[HA Room Card] Power total calculated:', data.power_total);
+        console.log('[HA Room Card] Power total:', data.power_total);
       } catch (error) {
-        console.error('[HA Room Card] Error calculating power total:', error);
+        console.error('[HA Room Card] Error calculating power:', error);
       }
     }
 
     // Presence count
     if (this.config.presence_list?.length) {
-      console.log('[HA Room Card] Counting presence for entities:', this.config.presence_list);
+      console.log('[HA Room Card] Counting presence for:', this.config.presence_list);
       try {
         data.presence_count = countEntitiesWithState(this.hass, this.config.presence_list, 'on');
-        console.log('[HA Room Card] Presence count calculated:', data.presence_count);
+        console.log('[HA Room Card] Presence count:', data.presence_count);
       } catch (error) {
         console.error('[HA Room Card] Error counting presence:', error);
       }
@@ -319,10 +322,10 @@ export class HaRoomCard extends LitElement {
 
     // Open count
     if (this.config.open_list?.length) {
-      console.log('[HA Room Card] Counting open entities:', this.config.open_list);
+      console.log('[HA Room Card] Counting open entities for:', this.config.open_list);
       try {
         data.open_count = countEntitiesWithState(this.hass, this.config.open_list, 'on');
-        console.log('[HA Room Card] Open count calculated:', data.open_count);
+        console.log('[HA Room Card] Open count:', data.open_count);
       } catch (error) {
         console.error('[HA Room Card] Error counting open entities:', error);
       }
@@ -330,14 +333,11 @@ export class HaRoomCard extends LitElement {
 
     // Light counts
     if (this.config.light_list?.length) {
-      console.log('[HA Room Card] Counting lights for entities:', this.config.light_list);
+      console.log('[HA Room Card] Counting lights for:', this.config.light_list);
       try {
         data.light_count = this.config.light_list.length;
         data.light_on_count = countEntitiesWithState(this.hass, this.config.light_list, 'on');
-        console.log('[HA Room Card] Light counts calculated:', {
-          total: data.light_count,
-          on: data.light_on_count
-        });
+        console.log('[HA Room Card] Light counts:', { total: data.light_count, on: data.light_on_count });
       } catch (error) {
         console.error('[HA Room Card] Error counting lights:', error);
       }

@@ -2,35 +2,24 @@ import { HomeAssistant } from 'custom-card-helpers';
 import { EntityState, ThresholdEntry, OPERATORS } from './types';
 
 export function computeEntityState(hass: HomeAssistant, entityId: string): EntityState | null {
-  console.log('[Utils] Computing entity state for:', entityId);
-
-  if (!hass) {
-    console.error('[Utils] Home Assistant instance is null/undefined');
-    return null;
-  }
-
-  if (!hass.states) {
-    console.error('[Utils] Home Assistant states object is null/undefined');
+  if (!hass || !hass.states) {
+    console.warn('[Utils] Home Assistant instance or states not available');
     return null;
   }
 
   const stateObj = hass.states[entityId];
   if (!stateObj) {
-    console.warn('[Utils] Entity not found in states:', entityId);
-    console.log('[Utils] Available entities:', Object.keys(hass.states).slice(0, 10), '... (showing first 10)');
+    console.warn('[Utils] Entity not found:', entityId);
     return null;
   }
 
-  const result = {
+  return {
     entity_id: entityId,
     state: stateObj.state,
     attributes: stateObj.attributes || {},
     last_changed: stateObj.last_changed,
     last_updated: stateObj.last_updated,
   };
-
-  console.log('[Utils] Entity state computed:', result);
-  return result;
 }
 
 export function isEntityOn(hass: HomeAssistant, entityId: string): boolean {
@@ -46,23 +35,18 @@ export function getEntityAttributeValue(hass: HomeAssistant, entityId: string, a
 }
 
 export function getNumericState(hass: HomeAssistant, entityId: string): number {
-  console.log('[Utils] Getting numeric state for entity:', entityId);
-
   const state = computeEntityState(hass, entityId);
   if (!state) {
-    console.warn('[Utils] No state found for entity, returning 0:', entityId);
+    console.warn('[Utils] No state for entity, returning 0:', entityId);
     return 0;
   }
 
-  console.log('[Utils] Raw state value:', state.state);
   const num = parseFloat(state.state);
-
   if (isNaN(num)) {
-    console.warn('[Utils] State value is not a number, returning 0:', { entityId, stateValue: state.state });
+    console.warn('[Utils] State not numeric for entity, returning 0:', entityId, 'value:', state.state);
     return 0;
   }
 
-  console.log('[Utils] Numeric state computed:', { entityId, numericValue: num });
   return num;
 }
 
@@ -101,22 +85,17 @@ export function evaluateThreshold(
 }
 
 export function calculateEntityTotals(hass: HomeAssistant, entityIds: string[]): number {
-  console.log('[Utils] Calculating totals for entities:', entityIds);
-
   if (!Array.isArray(entityIds)) {
     console.error('[Utils] entityIds is not an array:', entityIds);
     return 0;
   }
 
   const total = entityIds.reduce((runningTotal, entityId) => {
-    console.log('[Utils] Processing entity for total:', entityId);
     const entityValue = getNumericState(hass, entityId);
-    const newTotal = runningTotal + entityValue;
-    console.log('[Utils] Entity contribution:', { entityId, value: entityValue, runningTotal, newTotal });
-    return newTotal;
+    return runningTotal + entityValue;
   }, 0);
 
-  console.log('[Utils] Final calculated total:', { entityIds, total });
+  console.log('[Utils] Total calculated for entities:', entityIds, 'total:', total);
   return total;
 }
 
@@ -125,23 +104,17 @@ export function countEntitiesWithState(
   entityIds: string[],
   targetState: string = 'on'
 ): number {
-  console.log('[Utils] Counting entities with state:', { entityIds, targetState });
-
   if (!Array.isArray(entityIds)) {
     console.error('[Utils] entityIds is not an array:', entityIds);
     return 0;
   }
 
-  const matchingEntities = entityIds.filter(entityId => {
-    console.log('[Utils] Checking entity state:', entityId);
+  const count = entityIds.filter(entityId => {
     const state = computeEntityState(hass, entityId);
-    const matches = state?.state === targetState;
-    console.log('[Utils] Entity state check result:', { entityId, state: state?.state, targetState, matches });
-    return matches;
-  });
+    return state?.state === targetState;
+  }).length;
 
-  const count = matchingEntities.length;
-  console.log('[Utils] Final count result:', { entityIds, targetState, matchingEntities, count });
+  console.log('[Utils] Counted entities with state', targetState, ':', count, 'from', entityIds.length, 'entities');
   return count;
 }
 
