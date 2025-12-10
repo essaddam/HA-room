@@ -3,7 +3,7 @@
   "type": "object",
   "name": "HA Room Card",
   "description": "Custom room card with modern design and interactive features",
-  "version": "1.46.32",
+  "version": "1.46.33",
   "properties": {
     "type": {
       "type": "string",

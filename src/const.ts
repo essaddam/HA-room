@@ -1,4 +1,4 @@
-export const CARD_VERSION = '1.46.32';
+export const CARD_VERSION = '1.46.33';
 
 export const CARD_NAME = 'ha-room-card';
 export const CARD_EDITOR_NAME = 'ha-room-card-editor';
