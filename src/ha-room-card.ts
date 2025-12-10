@@ -1,5 +1,5 @@
 import { LitElement, html, css, TemplateResult, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { property, state } from 'lit/decorators.js';
 import { HomeAssistant } from 'custom-card-helpers';
 import { CARD_VERSION, CARD_NAME, DEFAULT_CONFIG } from './const.js';
 import { HaRoomCardConfig, RoomCardData } from './types.js';
@@ -68,9 +68,7 @@ function validateCustomElementRegistration(elementName: string): boolean {
   }
 }
 
-// Note: Custom element registration is handled by @customElement decorator
-// The registration happens automatically when the class is defined
-console.log(`[HA Room Card] Custom element '${CARD_NAME}' will be registered by @customElement decorator`);
+
 
 // Global initialization function to ensure proper timing
 window.addEventListener('DOMContentLoaded', () => {
@@ -95,7 +93,6 @@ window.addEventListener('DOMContentLoaded', () => {
 // Note: Validation will be performed after DOM is fully loaded
 // This ensures the @customElement decorator has completed registration
 
-@customElement(CARD_NAME)
 export class HaRoomCard extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
   @property({ attribute: false }) public config!: HaRoomCardConfig;
@@ -887,4 +884,21 @@ export class HaRoomCard extends LitElement {
   public getCardSize(): number {
     return 4; // 200px height (4 * 50px)
   }
+}
+
+// Force manual registration of the custom element after class definition
+console.log(`[HA Room Card] Attempting to register custom element '${CARD_NAME}'...`);
+
+try {
+  // Check if already registered
+  if (!customElements.get(CARD_NAME)) {
+    console.log(`[HA Room Card] Registering custom element '${CARD_NAME}' manually...`);
+    customElements.define(CARD_NAME, HaRoomCard);
+    console.log(`[HA Room Card] ✅ Custom element '${CARD_NAME}' registered successfully`);
+  } else {
+    console.log(`[HA Room Card] ℹ️ Custom element '${CARD_NAME}' already registered`);
+  }
+} catch (error) {
+  console.error(`[HA Room Card] ❌ Failed to register custom element '${CARD_NAME}':`, error);
+  throw error;
 }
