@@ -122,12 +122,10 @@ export declare class HaRoomCardEditor {
         icon_color: string;
         bg_start: string;
         bg_end: string;
-        temp_entity: string;
-        hum_entity: string;
-        power_list: string[];
-        light_list: string[];
-        presence_list: string[];
-        open_list: string[];
+        power_list: never[];
+        light_list: never[];
+        presence_list: never[];
+        open_list: never[];
     };
 }
 //# sourceMappingURL=ha-room-card-editor.d.ts.map

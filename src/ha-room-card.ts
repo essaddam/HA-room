@@ -31,8 +31,8 @@ const cardConfig = {
   name: 'HA Room Card',
   description: 'Custom room card with modern design and interactive features',
   preview: true,
-  documentationURL: 'https://github.com/essadam/ha-room#readme',
-  schemaURL: '/hacsfiles/ha-room-card/ha-room-card-schema.json',
+  documentationURL: 'https://github.com/essaddam/HA-room#readme',
+  schemaURL: '/hacsfiles/ha-room-card/dist/ha-room-card-schema.json',
 };
 console.log('[HA Room Card] Card config:', cardConfig);
 (window as any).customCards.push(cardConfig);
@@ -716,7 +716,7 @@ export class HaRoomCard extends LitElement {
         <!-- Full card overlay for actions -->
         ${this.config.features?.includes('full_card_actions')
         ? html`<div class="full-card-overlay" @click=${() => this._handleCardAction()}></div>`
-        : typeof nothing
+        : nothing
       }
 
         <!-- Header -->

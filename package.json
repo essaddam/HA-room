@@ -46,10 +46,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/ha-room-card.git"
+    "url": "https://github.com/essaddam/HA-room.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/ha-room-card/issues"
+    "url": "https://github.com/essaddam/HA-room/issues"
   },
-  "homepage": "https://github.com/yourusername/ha-room-card#readme"
+  "homepage": "https://github.com/essaddam/HA-room#readme"
 }

@@ -307,12 +307,10 @@ export class HaRoomCardEditor {
       icon_color: '#ffffff',
       bg_start: '#667eea',
       bg_end: '#764ba2',
-      temp_entity: 'sensor.temperature_salon',
-      hum_entity: 'sensor.humidity_salon',
-      power_list: ['sensor.tv_power', 'sensor.lamp_power'],
-      light_list: ['light.living_room_main', 'light.living_roomAccent'],
-      presence_list: ['binary_sensor.motion'],
-      open_list: ['binary_sensor.door', 'binary_sensor.window'],
+      power_list: [],
+      light_list: [],
+      presence_list: [],
+      open_list: [],
     };
     console.log('[HA Room Card Editor] Stub config created:', stubConfig);
     return stubConfig;
