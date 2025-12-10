@@ -254,11 +254,6 @@ export class HaRoomCard extends LitElement {
     console.log('[HA Room Card] Final config:', this.config);
   }
 
-  protected shouldUpdate(): boolean {
-    // Only update if hass or config has changed
-    return !!(this.hass && this.config);
-  }
-
   protected willUpdate(changedProperties: Map<string, any>): void {
     // Only update room data if hass or config has changed
     if (changedProperties.has('hass') || changedProperties.has('config')) {
