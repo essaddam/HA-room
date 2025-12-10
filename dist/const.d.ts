@@ -1,4 +1,4 @@
-export declare const CARD_VERSION = "1.46.26";
+export declare const CARD_VERSION = "1.46.27";
 export declare const CARD_NAME = "ha-room-card";
 export declare const DEFAULT_CONFIG: {
     name: string;

@@ -54,7 +54,9 @@ try {
 // Custom element registration validation
 function validateCustomElementRegistration(elementName: string): boolean {
   try {
-    if (!customElements.get(elementName)) {
+    // Check if the element is registered
+    const elementClass = customElements.get(elementName);
+    if (!elementClass) {
       console.error(`[HA Room Card] Custom element '${elementName}' is not registered`);
       return false;
     }
@@ -66,20 +68,9 @@ function validateCustomElementRegistration(elementName: string): boolean {
   }
 }
 
-// Register the custom element with validation
-try {
-  console.log(`[HA Room Card] Registering custom element: ${CARD_NAME}`);
-
-  // Check if already registered
-  if (customElements.get(CARD_NAME)) {
-    console.log(`[HA Room Card] Custom element '${CARD_NAME}' already registered`);
-  } else {
-    console.log(`[HA Room Card] Custom element '${CARD_NAME}' registration successful`);
-  }
-} catch (error) {
-  console.error(`[HA Room Card] Failed to register custom element '${CARD_NAME}':`, error);
-  throw error;
-}
+// Note: Custom element registration is handled by @customElement decorator
+// The registration happens automatically when the class is defined
+console.log(`[HA Room Card] Custom element '${CARD_NAME}' will be registered by @customElement decorator`);
 
 // Global initialization function to ensure proper timing
 window.addEventListener('DOMContentLoaded', () => {
@@ -101,23 +92,8 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Also validate immediately for cases where DOM is already loaded
-if (document.readyState === 'loading') {
-  console.log('[HA Room Card] Document still loading - validation scheduled for DOMContentLoaded');
-} else {
-  console.log('[HA Room Card] Document already loaded - validating immediately');
-
-  // Validate custom card registration
-  const customCardRegistered = (window as any).customCards?.some((card: any) => card.type === `custom:${CARD_NAME}`);
-  if (!customCardRegistered) {
-    console.error('[HA Room Card] Custom card not found in window.customCards');
-  } else {
-    console.log('[HA Room Card] Custom card registration confirmed');
-  }
-
-  // Validate custom element registration
-  validateCustomElementRegistration(CARD_NAME);
-}
+// Note: Validation will be performed after DOM is fully loaded
+// This ensures the @customElement decorator has completed registration
 
 @customElement(CARD_NAME)
 export class HaRoomCard extends LitElement {
@@ -127,14 +103,7 @@ export class HaRoomCard extends LitElement {
 
   constructor() {
     super();
-
-    // Validate custom element registration in constructor
-    if (!validateCustomElementRegistration(CARD_NAME)) {
-      console.error(`[HA Room Card] Constructor validation failed for element: ${CARD_NAME}`);
-      throw new Error(`Custom element '${CARD_NAME}' is not properly registered`);
-    }
-
-    console.log(`[HA Room Card] Constructor validation passed for element: ${CARD_NAME}`);
+    console.log(`[HA Room Card] Constructor called for element: ${CARD_NAME}`);
   }
 
   static get styles() {
