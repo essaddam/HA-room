@@ -47,6 +47,8 @@ export declare class HaRoomCard extends LitElement {
         columns: number;
         min_rows: number;
         max_rows: number;
+        min_columns: number;
+        max_columns: number;
     };
     getCardSize(): number;
 }
