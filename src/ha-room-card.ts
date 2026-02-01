@@ -1,7 +1,7 @@
 import { LitElement, html, css, TemplateResult, nothing } from 'lit';
 import { property, state, customElement } from 'lit/decorators.js';
 import { HomeAssistant, LovelaceCardEditor } from 'custom-card-helpers';
-import { CARD_VERSION, CARD_NAME, CARD_FULL_NAME, CARD_EDITOR_NAME, DEFAULT_CONFIG, logger } from './const.js';
+import { CARD_VERSION, CARD_NAME, CARD_ELEMENT_NAME, CARD_FULL_NAME, CARD_EDITOR_NAME, DEFAULT_CONFIG, logger } from './const.js';
 import { HaRoomCardConfig, RoomCardData, ChangedProperties, CardAction, isNavigateAction, isMoreInfoAction, isCallServiceAction } from './types.js';
 import {
   computeEntityState,
@@ -13,6 +13,7 @@ import {
   formatPower,
   registerCustomCard,
 } from './utils.js';
+import { loadHaComponents } from './utils/loader.js';
 
 
 console.info(
@@ -31,7 +32,7 @@ registerCustomCard({
 logger.log(`[HA Room Card] Registering custom card with type: custom:${CARD_NAME}`);
 logger.log(`[HA Room Card] CARD_NAME value: ${CARD_NAME}`);
 
-@customElement(CARD_FULL_NAME)
+@customElement(CARD_ELEMENT_NAME)
 export class HaRoomCard extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
   @property({ attribute: false }) public config!: HaRoomCardConfig;
@@ -785,3 +786,17 @@ export class HaRoomCard extends LitElement {
   }
 }
 
+// Explicit element registration with error handling
+try {
+  if (!customElements.get(CARD_ELEMENT_NAME)) {
+    customElements.define(CARD_ELEMENT_NAME, HaRoomCard);
+    console.info(`[HA Room Card] Element "${CARD_ELEMENT_NAME}" registered successfully`);
+  } else {
+    console.warn(`[HA Room Card] Element "${CARD_ELEMENT_NAME}" was already registered`);
+  }
+} catch (error) {
+  console.error(`[HA Room Card] Failed to register element:`, error);
+}
+
+// Pre-load HA components for the editor
+void loadHaComponents();

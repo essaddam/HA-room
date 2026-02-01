@@ -1,7 +1,10 @@
 export const CARD_VERSION = '1.47.5';
 
 export const CARD_NAME = 'ha-room-card';
-export const CARD_FULL_NAME = 'custom:ha-room-card';
+// Use valid custom element name (no colon) for browser registration
+// The 'custom:' prefix is only for YAML config, not DOM element names
+export const CARD_ELEMENT_NAME = 'ha-room-card';
+export const CARD_FULL_NAME = 'custom:ha-room-card'; // For YAML config type
 export const CARD_EDITOR_NAME = 'ha-room-card-editor';
 
 // Debug mode - enabled only in development

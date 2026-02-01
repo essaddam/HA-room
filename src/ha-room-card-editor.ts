@@ -1,18 +1,130 @@
-import { LitElement, html, nothing } from 'lit';
+import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { HomeAssistant, fireEvent, LovelaceCardEditor } from 'custom-card-helpers';
 import { HaRoomCardConfig } from './types.js';
 import { CARD_EDITOR_NAME } from './const.js';
-import { loadHaComponents } from './utils/loader.js';
+import { loadHaComponents, areComponentsLoaded } from './utils/loader.js';
 
 @customElement(CARD_EDITOR_NAME)
 export class HaRoomCardEditor extends LitElement implements LovelaceCardEditor {
   @property({ attribute: false }) public hass?: HomeAssistant;
   @state() private _config?: HaRoomCardConfig;
+  @state() private _componentsLoaded = false;
+
+  static get styles() {
+    return css`
+      :host {
+        display: block;
+        padding: 16px 0;
+      }
+      .error {
+        color: var(--error-color, #db4437);
+        background: var(--error-background, rgba(219, 68, 55, 0.1));
+        border: 1px solid var(--error-color, #db4437);
+        border-radius: 8px;
+        padding: 16px;
+        margin: 8px 0;
+      }
+      .loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        color: var(--secondary-text-color);
+      }
+      .manual-config {
+        margin-top: 16px;
+      }
+      .manual-config textarea {
+        width: 100%;
+        min-height: 200px;
+        font-family: monospace;
+        font-size: 14px;
+        padding: 12px;
+        border: 1px solid var(--divider-color);
+        border-radius: 8px;
+        background: var(--card-background-color);
+        color: var(--primary-text-color);
+        resize: vertical;
+      }
+      .info {
+        color: var(--secondary-text-color);
+        font-size: 0.9em;
+        margin-top: 8px;
+        padding: 8px;
+        background: var(--secondary-background-color);
+        border-radius: 4px;
+      }
+      .section-title {
+        font-weight: 500;
+        margin: 16px 0 8px 0;
+        color: var(--primary-text-color);
+      }
+      .entity-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 8px 0;
+      }
+      .entity-row input {
+        flex: 1;
+        padding: 8px;
+        border: 1px solid var(--divider-color);
+        border-radius: 4px;
+        background: var(--card-background-color);
+        color: var(--primary-text-color);
+      }
+      .entity-row button {
+        padding: 8px 16px;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .entity-list {
+        margin-top: 8px;
+      }
+      .entity-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 8px;
+        margin: 4px;
+        background: var(--secondary-background-color);
+        border-radius: 12px;
+        font-size: 0.85em;
+      }
+      .entity-tag button {
+        background: none;
+        border: none;
+        color: var(--error-color);
+        cursor: pointer;
+        font-size: 1.2em;
+        line-height: 1;
+      }
+    `;
+  }
 
   connectedCallback() {
     super.connectedCallback();
-    void loadHaComponents();
+    this._loadComponents();
+  }
+
+  private async _loadComponents() {
+    try {
+      await loadHaComponents();
+      this._componentsLoaded = areComponentsLoaded();
+      if (!this._componentsLoaded) {
+        // Try again after a short delay
+        setTimeout(async () => {
+          await loadHaComponents();
+          this._componentsLoaded = areComponentsLoaded();
+        }, 2000);
+      }
+    } catch (e) {
+      console.error('[HA Room Card] Failed to load components:', e);
+    }
   }
 
   public setConfig(config: any): void {
@@ -23,6 +135,18 @@ export class HaRoomCardEditor extends LitElement implements LovelaceCardEditor {
     if (!this.hass || !this._config) {
       return nothing;
     }
+
+    // If components are loaded, use the full form editor
+    if (this._componentsLoaded && customElements.get('ha-form')) {
+      return this._renderHaForm();
+    }
+
+    // Otherwise, use the fallback manual editor
+    return this._renderFallbackEditor();
+  }
+
+  private _renderHaForm() {
+    if (!this._config || !this.hass) return nothing;
 
     const schema = this._getSchema();
     const data = this._config;
@@ -36,6 +160,42 @@ export class HaRoomCardEditor extends LitElement implements LovelaceCardEditor {
         @value-changed=${this._valueChanged}
       ></ha-form>
     `;
+  }
+
+  private _renderFallbackEditor() {
+    if (!this._config) return nothing;
+
+    const configJson = JSON.stringify(this._config, null, 2);
+
+    return html`
+      <div class="info">
+        <strong>Mode édition manuel</strong><br>
+        L'éditeur visuel n'a pas pu être chargé. Vous pouvez modifier la configuration manuellement ci-dessous.
+      </div>
+
+      <div class="manual-config">
+        <div class="section-title">Configuration JSON</div>
+        <textarea
+          .value=${configJson}
+          @change=${this._handleJsonChange}
+        ></textarea>
+      </div>
+
+      <div class="info" style="margin-top: 16px;">
+        <strong>Conseil :</strong> Utilisez les sélecteurs d'entités de Home Assistant pour trouver vos entités,
+        puis copiez leurs IDs dans la configuration.
+      </div>
+    `;
+  }
+
+  private _handleJsonChange(ev: Event) {
+    const target = ev.target as HTMLTextAreaElement;
+    try {
+      const config = JSON.parse(target.value);
+      fireEvent(this, 'config-changed', { config });
+    } catch (e) {
+      // Don't fire event on invalid JSON - user can fix and try again
+    }
   }
 
   private _valueChanged(ev: CustomEvent): void {
