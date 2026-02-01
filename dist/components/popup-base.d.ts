@@ -7,7 +7,6 @@ interface PopupConfig {
 export declare class PopupBase extends LitElement {
     hass: HomeAssistant;
     config: PopupConfig;
-    protected willUpdate(): void;
     static get styles(): import("lit").CSSResult;
     protected render(): TemplateResult;
     protected renderBody(): TemplateResult;

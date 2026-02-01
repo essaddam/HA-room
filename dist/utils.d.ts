@@ -2,7 +2,7 @@ import { HomeAssistant } from 'custom-card-helpers';
 import { EntityState, ThresholdEntry } from './types';
 export declare function computeEntityState(hass: HomeAssistant, entityId: string): EntityState | null;
 export declare function isEntityOn(hass: HomeAssistant, entityId: string): boolean;
-export declare function getEntityAttributeValue(hass: HomeAssistant, entityId: string, attribute: string): any;
+export declare function getEntityAttributeValue(hass: HomeAssistant, entityId: string, attribute: string): unknown;
 export declare function getNumericState(hass: HomeAssistant, entityId: string): number;
 export declare function evaluateThreshold(hass: HomeAssistant, threshold: ThresholdEntry, sensorValue?: number): boolean;
 export declare function calculateEntityTotals(hass: HomeAssistant, entityIds: string[]): number;

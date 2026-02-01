@@ -1,6 +1,6 @@
 import { LitElement, TemplateResult } from 'lit';
 import { HomeAssistant, LovelaceCardEditor } from 'custom-card-helpers';
-import { HaRoomCardConfig } from './types.js';
+import { HaRoomCardConfig, ChangedProperties } from './types.js';
 export declare class HaRoomCard extends LitElement {
     hass: HomeAssistant;
     config: HaRoomCardConfig;
@@ -8,7 +8,7 @@ export declare class HaRoomCard extends LitElement {
     constructor();
     static get styles(): import("lit").CSSResult;
     setConfig(config: HaRoomCardConfig): void;
-    protected willUpdate(changedProperties: Map<string, any>): void;
+    protected willUpdate(changedProperties: ChangedProperties): void;
     private _updateRoomData;
     private _isValidNavigationPath;
     private _executeAction;

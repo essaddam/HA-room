@@ -1,4 +1,14 @@
-import { ActionConfig, LovelaceCard } from 'custom-card-helpers';
+import { ActionConfig, LovelaceCard, NavigateActionConfig, MoreInfoActionConfig, CallServiceActionConfig } from 'custom-card-helpers';
+import type { PropertyValues } from 'lit';
+export type ChangedProperties = PropertyValues<unknown>;
+export type CardAction = NavigateActionConfig | MoreInfoActionConfig | CallServiceActionConfig | {
+    action: 'none';
+} | {
+    action: string;
+};
+export declare function isNavigateAction(action: CardAction): action is NavigateActionConfig;
+export declare function isMoreInfoAction(action: CardAction): action is MoreInfoActionConfig;
+export declare function isCallServiceAction(action: CardAction): action is CallServiceActionConfig;
 export interface HaRoomCardConfig extends LovelaceCard {
     name?: string;
     icon?: string;

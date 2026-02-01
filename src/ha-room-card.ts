@@ -375,8 +375,8 @@ export class HaRoomCard extends LitElement {
   private _isValidNavigationPath(path: string): boolean {
     // Allow hash-based navigation (most common in HA), absolute paths, or external URLs
     return /^#[a-zA-Z0-9_-]+$/.test(path) ||
-           /^\//.test(path) ||
-           /^https?:\/\//.test(path);
+           /^\/[a-zA-Z0-9_/-]+$/.test(path) ||
+           /^https:\/\/[a-zA-Z0-9][-a-zA-Z0-9]*\.[-a-zA-Z0-9.]+/.test(path);
   }
 
   private _executeAction(action: CardAction | undefined, context: string): void {
@@ -719,9 +719,12 @@ export class HaRoomCard extends LitElement {
         <div class="chips-container">
           ${this._renderTemperatureChip()}
           ${this._renderHumidityChip()}
-          ${this.config.extra_chips?.map(chip =>
-        this._renderChip(chip.icon, chip.icon_color, chip.content, chip.tap_action)
-      )}
+          ${this.config.extra_chips?.map(chip => {
+        const sanitizedContent = chip.content?.replace(/[<>"']/g, '') ?? '';
+        const sanitizedIcon = chip.icon?.replace(/[<>"']/g, '') ?? 'mdi:help-circle';
+        const sanitizedColor = chip.icon_color?.replace(/[<>"']/g, '') ?? 'white';
+        return this._renderChip(sanitizedIcon, sanitizedColor, sanitizedContent, chip.tap_action);
+      })}
           ${this._renderPowerChip()}
           ${this._renderPresenceChip()}
           ${this._renderOpenChip()}
@@ -771,6 +774,8 @@ export class HaRoomCard extends LitElement {
       columns: 6,
       min_rows: 3,
       max_rows: 5,
+      min_columns: 4,
+      max_columns: 6,
     };
   }
 
