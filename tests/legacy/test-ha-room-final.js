@@ -1,6 +1,7 @@
 import puppeteer from 'puppeteer';
+import { TEST_CREDENTIALS } from './test-credentials.js';
 
-async function testHARoomEditorFixed() {
+async function testHARoomEditor() {
     console.log('🚀 Test final de l\'éditeur ha-room installé...');
     
     let browser;
@@ -21,8 +22,8 @@ async function testHARoomEditorFixed() {
         
         await new Promise(resolve => setTimeout(resolve, 3000));
         
-        await page.type('input[name="username"]', 'dev');
-        await page.type('input[name="password"]', 'Dev@2017!');
+        await page.type('input[name="username"]', TEST_CREDENTIALS.username);
+        await page.type('input[name="password"]', TEST_CREDENTIALS.password);
         
         const submitButton = await page.$('button');
         if (submitButton) {
@@ -41,28 +42,35 @@ async function testHARoomEditorFixed() {
                 s.src.includes('ha-room') || s.src.includes('hacsfiles')
             );
             
-            // Vérifier si ha-room est dans le DOM
-            const haRoomElements = Array.from(document.querySelectorAll('*'));
-            const hasHARoomElements = haRoomElements.some(el => {
-                const text = el.textContent || el.innerText || '';
-                return text.toLowerCase().includes('ha-room') && !text.toLowerCase().includes('script');
-            });
+            // Vérifier les éléments personnalisés
+            const customElements = window.customCards || [];
+            const haRoomCard = customElements.find(card => 
+                card.type && card.type.includes('ha-room')
+            );
             
             return {
                 haRoomScriptFound: !!haRoomScript,
                 haRoomScriptUrl: haRoomScript ? haRoomScript.src : null,
-                hasHARoomElements: hasHARoomElements,
-                totalScripts: scripts.length
+                haRoomCardRegistered: !!haRoomCard,
+                totalCustomCards: customElements.length,
+                allCustomCards: customCards
             };
         });
         
         console.log('📊 Analyse de l\'installation:');
         console.log(`   Script ha-room trouvé: ${pageAnalysis.haRoomScriptFound}`);
-        console.log(`   Éléments ha-room trouvés: ${pageAnalysis.hasHARoomElements}`);
-        console.log(`   Total scripts: ${pageAnalysis.totalScripts}`);
+        console.log(`   Carte ha-room enregistrée: ${pageAnalysis.haRoomCardRegistered}`);
+        console.log(`   Total cartes personnalisées: ${pageAnalysis.totalCustomCards}`);
         
         if (pageAnalysis.haRoomScriptFound) {
             console.log(`   URL du script: ${pageAnalysis.haRoomScriptUrl}`);
+        }
+        
+        if (pageAnalysis.allCustomCards.length > 0) {
+            console.log('   Cartes disponibles:');
+            pageAnalysis.allCustomCards.forEach((card, index) => {
+                console.log(`     ${index + 1}. ${card.type} - ${card.name}`);
+            });
         }
         
         await page.screenshot({ path: 'tests-reports/final1-ha-room-installed.png', fullPage: true });
@@ -100,10 +108,10 @@ async function testHARoomEditorFixed() {
             console.log('🔍 Recherche de ha-room dans le sélecteur de cartes...');
             
             const haRoomCard = await page.evaluate(() => {
-                const cards = Array.from(document.querySelectorAll('ha-card-picker .card, .card-type, [data-card-type], paper-item, mwc-list-item, ha-list-item'));
+                const cards = Array.from(document.querySelectorAll('ha-card-picker .card, .card-type, [data-card-type], paper-item, mwc-list-item'));
                 for (const card of cards) {
                     const text = card.textContent || card.innerText || '';
-                    if (text.toLowerCase().includes('ha-room') || (text.toLowerCase().includes('room') && !text.toLowerCase().includes('weather'))) {
+                    if (text.toLowerCase().includes('ha-room') || text.toLowerCase().includes('room')) {
                         return card;
                     }
                 }
@@ -111,7 +119,7 @@ async function testHARoomEditorFixed() {
             });
             
             if (haRoomCard) {
-                console.log('✅ Carte ha-room trouvée!');
+                console.log('✅ Carte ha-room trouvée dans le sélecteur!');
                 await page.evaluate((card) => card.click(), haRoomCard);
                 await new Promise(resolve => setTimeout(resolve, 3000));
                 
@@ -120,7 +128,7 @@ async function testHARoomEditorFixed() {
                 
                 // Analyser l'éditeur
                 const editorAnalysis = await page.evaluate(() => {
-                    const editor = document.querySelector('ha-editor, .ha-editor, [data-editor], .editor-form, .card-editor');
+                    const editor = document.querySelector('ha-editor, .ha-editor, [data-editor], .editor-form');
                     if (editor) {
                         const inputs = editor.querySelectorAll('input, select, ha-textfield, ha-form-field, paper-input, paper-dropdown-menu');
                         const buttons = editor.querySelectorAll('button, ha-button, mwc-button');
@@ -200,9 +208,9 @@ async function testHARoomEditorFixed() {
             } else {
                 console.log('❌ Carte ha-room non trouvée dans le sélecteur');
                 
-                // Afficher toutes les cartes disponibles pour diagnostic
+                // Afficher toutes les cartes disponibles
                 const availableCards = await page.evaluate(() => {
-                    const cards = Array.from(document.querySelectorAll('ha-card-picker .card, .card-type, [data-card-type], paper-item, mwc-list-item, ha-list-item'));
+                    const cards = Array.from(document.querySelectorAll('ha-card-picker .card, .card-type, [data-card-type], paper-item, mwc-list-item'));
                     return cards.map(card => ({
                         text: (card.textContent || card.innerText || '').trim(),
                         type: card.getAttribute('data-card-type') || card.tagName
@@ -239,4 +247,4 @@ async function testHARoomEditorFixed() {
     }
 }
 
-testHARoomEditorFixed();
+testHARoomEditor();

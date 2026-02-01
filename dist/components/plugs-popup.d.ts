@@ -2,7 +2,7 @@ import { TemplateResult } from 'lit';
 import { PopupBase } from './popup-base.js';
 export declare class PlugsPopup extends PopupBase {
     entities: string[];
-    powerList: string[];
+    power_list: string[];
     static get styles(): import("lit").CSSResult;
     protected renderBody(): TemplateResult;
     private _renderEntity;

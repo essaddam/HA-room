@@ -10,6 +10,8 @@ export declare class HaRoomCard extends LitElement {
     setConfig(config: HaRoomCardConfig): void;
     protected willUpdate(changedProperties: Map<string, any>): void;
     private _updateRoomData;
+    private _isValidNavigationPath;
+    private _executeAction;
     private _handleCardAction;
     private _renderChip;
     private _handleChipAction;

@@ -1,0 +1,74 @@
+# Configuration Home Assistant pour tests
+default_config:
+
+http:
+  server_port: 8123
+  cors_allowed_origins:
+    - http://localhost:8123
+    - http://homeassistant.local:8123
+
+# Configuration frontend pour Home Assistant
+frontend:
+
+# Utilisateur de test
+homeassistant:
+  name: Test Home
+  latitude: 48.8566
+  longitude: 2.3522
+  elevation: 35
+  unit_system: metric
+  time_zone: Europe/Paris
+  auth_providers:
+    - type: homeassistant
+
+# Lovelace en mode YAML pour tests
+lovelace:
+  mode: yaml
+  resources:
+    - url: /local/community/ha-room-card/ha-room-card.js
+      type: module
+
+# Entités de test
+sensor:
+  - platform: template
+    sensors:
+      test_temperature:
+        friendly_name: "Température Test"
+        value_template: "22.5"
+        unit_of_measurement: "°C"
+      
+      test_humidity:
+        friendly_name: "Humidité Test"
+        value_template: "45"
+        unit_of_measurement: "%"
+      
+      test_power:
+        friendly_name: "Consommation Test"
+        value_template: "150"
+        unit_of_measurement: "W"
+
+binary_sensor:
+  - platform: template
+    sensors:
+      test_presence:
+        friendly_name: "Présence Test"
+        value_template: "on"
+      
+      test_door:
+        friendly_name: "Porte Test"
+        value_template: "off"
+
+light:
+  - platform: template
+    lights:
+      test_light_1:
+        friendly_name: "Lumière Test 1"
+        turn_on:
+        turn_off:
+        set_level:
+      
+      test_light_2:
+        friendly_name: "Lumière Test 2"
+        turn_on:
+        turn_off:
+        set_level:

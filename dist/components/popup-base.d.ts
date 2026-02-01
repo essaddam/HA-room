@@ -1,7 +1,12 @@
 import { LitElement, TemplateResult } from 'lit';
+import { HomeAssistant } from 'custom-card-helpers';
+interface PopupConfig {
+    icon?: string;
+    title?: string;
+}
 export declare class PopupBase extends LitElement {
-    hass: any;
-    config: any;
+    hass: HomeAssistant;
+    config: PopupConfig;
     protected willUpdate(): void;
     static get styles(): import("lit").CSSResult;
     protected render(): TemplateResult;
@@ -10,4 +15,5 @@ export declare class PopupBase extends LitElement {
     open(): void;
     close(): void;
 }
+export {};
 //# sourceMappingURL=popup-base.d.ts.map

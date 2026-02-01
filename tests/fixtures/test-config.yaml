@@ -1,0 +1,222 @@
+# Test configuration for HA Room Card
+# This file contains various test scenarios and configurations
+
+# Basic room card configuration
+basic_room_card:
+  type: custom:ha-room-card
+  room_name: Salon
+  entities:
+    - light.salon_light
+    - light.chambre_light
+    - sensor.temperature_salon
+    - sensor.humidite_salon
+
+# Room card with custom title
+custom_title_card:
+  type: custom:ha-room-card
+  title: "Mon Salon"
+  entities:
+    - light.salon_light
+    - switch.salon_switch
+
+# Room card with lights only
+lights_only_card:
+  type: custom:ha-room-card
+  room_name: Salon
+  entity_types:
+    lights: true
+    switches: false
+    sensors: false
+    binary_sensors: false
+  entities:
+    - light.salon_light
+    - light.chambre_light
+
+# Room card with sensors only
+sensors_only_card:
+  type: custom:ha-room-card
+  room_name: Salon
+  entity_types:
+    lights: false
+    switches: false
+    sensors: true
+    binary_sensors: false
+  entities:
+    - sensor.temperature_salon
+    - sensor.humidite_salon
+
+# Room card with binary sensors (doors, windows)
+binary_sensors_card:
+  type: custom:ha-room-card
+  room_name: Salon
+  entity_types:
+    lights: false
+    switches: false
+    sensors: false
+    binary_sensors: true
+  entities:
+    - binary_sensor.porte_salon
+    - binary_sensor.fenetre_chambre
+
+# Room card with custom icons
+custom_icons_card:
+  type: custom:ha-room-card
+  room_name: Salon
+  entities:
+    - entity: light.salon_light
+      icon: mdi:ceiling-light
+    - entity: light.chambre_light
+      icon: mdi:lamp
+    - entity: sensor.temperature_salon
+      icon: mdi:thermometer
+
+# Room card with custom colors
+custom_colors_card:
+  type: custom:ha-room-card
+  room_name: Salon
+  theme_colors:
+    primary: "#2196F3"
+    secondary: "#FFC107"
+    background: "#FAFAFA"
+  entities:
+    - light.salon_light
+    - light.chambre_light
+
+# Room card with popup configuration
+popup_config_card:
+  type: custom:ha-room-card
+  room_name: Salon
+  popup:
+    show_details: true
+    show_controls: true
+    auto_close: 5000
+  entities:
+    - light.salon_light
+    - light.chambre_light
+    - switch.salon_switch
+
+# Room card with state filtering
+state_filter_card:
+  type: custom:ha-room-card
+  room_name: Salon
+  show_only:
+    - on
+    - open
+  entities:
+    - light.salon_light
+    - light.chambre_light
+    - binary_sensor.porte_salon
+    - binary_sensor.fenetre_chambre
+
+# Room card with grouping
+grouped_card:
+  type: custom:ha-room-card
+  room_name: Salon
+  groups:
+    lights:
+      title: "Éclairage"
+      entities:
+        - light.salon_light
+        - light.chambre_light
+    climate:
+      title: "Climat"
+      entities:
+        - sensor.temperature_salon
+        - sensor.humidite_salon
+    security:
+      title: "Sécurité"
+      entities:
+        - binary_sensor.porte_salon
+        - binary_sensor.fenetre_chambre
+
+# Room card with advanced configuration
+advanced_card:
+  type: custom:ha-room-card
+  room_name: Salon
+  title: "Salon Principal"
+  compact_view: false
+  show_entity_count: true
+  show_last_updated: true
+  update_interval: 30
+  entities:
+    - entity: light.salon_light
+      name: "Lumière Salon"
+      icon: mdi:ceiling-light
+      tap_action:
+        action: toggle
+      hold_action:
+        action: more-info
+    - entity: sensor.temperature_salon
+      name: "Température"
+      icon: mdi:thermometer
+      unit: "°C"
+    - entity: binary_sensor.porte_salon
+      name: "Porte d'entrée"
+      icon: mdi:door
+
+# Empty configuration (for error testing)
+empty_config_card:
+  type: custom:ha-room-card
+
+# Invalid entity configuration (for error testing)
+invalid_entities_card:
+  type: custom:ha-room-card
+  room_name: Salon
+  entities:
+    - light.nonexistent_light
+    - sensor.invalid_sensor
+    - binary_sensor.unknown_binary_sensor
+
+# Configuration with mixed entity types
+mixed_entities_card:
+  type: custom:ha-room-card
+  room_name: Salon
+  entities:
+    - light.salon_light
+    - switch.salon_switch
+    - sensor.temperature_salon
+    - sensor.humidite_salon
+    - binary_sensor.porte_salon
+    - binary_sensor.fenetre_chambre
+
+# Configuration with custom actions
+custom_actions_card:
+  type: custom:ha-room-card
+  room_name: Salon
+  entities:
+    - entity: light.salon_light
+      tap_action:
+        action: call-service
+        service: light.toggle
+        service_data:
+          entity_id: light.salon_light
+      hold_action:
+        action: navigate
+        navigation_path: /config/automation
+    - entity: sensor.temperature_salon
+      tap_action:
+        action: more-info
+      hold_action:
+        action: none
+
+# Configuration for responsive testing
+responsive_card:
+  type: custom:ha-room-card
+  room_name: Salon
+  responsive:
+    mobile:
+      columns: 1
+      show_labels: false
+    tablet:
+      columns: 2
+      show_labels: true
+    desktop:
+      columns: 3
+      show_labels: true
+  entities:
+    - light.salon_light
+    - light.chambre_light
+    - switch.salon_switch
+    - sensor.temperature_salon
+    - sensor.humidite_salon
+    - binary_sensor.porte_salon

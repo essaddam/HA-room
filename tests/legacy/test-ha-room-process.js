@@ -1,4 +1,5 @@
 import puppeteer from 'puppeteer';
+import { TEST_CREDENTIALS } from './test-credentials.js';
 
 async function testHARoomProcess() {
     console.log('🚀 Démarrage du processus de test ha-room spécifique...');
@@ -21,9 +22,9 @@ async function testHARoomProcess() {
 
         await new Promise(resolve => setTimeout(resolve, 3000));
 
-        // Connexion
-        await page.type('input[name="username"]', 'dev');
-        await page.type('input[name="password"]', 'Dev@2017!');
+        // Connexion avec les identifiants de test
+        await page.type('input[name="username"]', TEST_CREDENTIALS.username);
+        await page.type('input[name="password"]', TEST_CREDENTIALS.password);
 
         const submitButton = await page.$('button');
         if (submitButton) {

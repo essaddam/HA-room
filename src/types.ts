@@ -1,4 +1,35 @@
-import { ActionConfig, LovelaceCard } from 'custom-card-helpers';
+import {
+  ActionConfig,
+  LovelaceCard,
+  NavigateActionConfig,
+  MoreInfoActionConfig,
+  CallServiceActionConfig,
+} from 'custom-card-helpers';
+import type { PropertyValues } from 'lit';
+
+// Re-export PropertyValues as ChangedProperties for semantic clarity
+export type ChangedProperties = PropertyValues<unknown>;
+
+// Action type used within the card - union of all possible action types
+export type CardAction =
+  | NavigateActionConfig
+  | MoreInfoActionConfig
+  | CallServiceActionConfig
+  | { action: 'none' }
+  | { action: string }; // Fallback for custom/unknown actions
+
+// Type guard functions for narrowing CardAction types
+export function isNavigateAction(action: CardAction): action is NavigateActionConfig {
+  return action.action === 'navigate' && 'navigation_path' in action;
+}
+
+export function isMoreInfoAction(action: CardAction): action is MoreInfoActionConfig {
+  return action.action === 'more-info' && 'entity' in action;
+}
+
+export function isCallServiceAction(action: CardAction): action is CallServiceActionConfig {
+  return action.action === 'call-service' && 'service' in action;
+}
 
 export interface HaRoomCardConfig extends LovelaceCard {
   // Basic configuration
@@ -47,8 +78,10 @@ export interface HaRoomCardConfig extends LovelaceCard {
   double_tap_action?: ActionConfig;
 }
 
+// Navigation path type for validation
+export type NavigationPath = `#${string}` | `/${string}` | `https://${string}` | `http://${string}`;
+
 export interface EntityChipConfig {
-  type: 'template';
   icon: string;
   icon_color: string;
   content: string;

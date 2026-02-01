@@ -16,7 +16,23 @@
     "version": "node scripts/auto-version.js",
     "version-tag": "node scripts/auto-version.js --tag",
     "create-release": "node scripts/create-release.js",
-    "release": "npm run version-tag && npm run build && npm run create-release"
+    "docker:up": "cd .devcontainer && docker-compose up -d",
+    "docker:down": "cd .devcontainer && docker-compose down",
+    "docker:logs": "cd .devcontainer && docker-compose logs -f homeassistant",
+    "docker:restart": "npm run docker:down && npm run docker:up",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test tests/e2e",
+    "test:e2e:ui": "playwright test tests/e2e --ui",
+    "test:docker": "npm run docker:up && npm run build && npm run test:e2e",
+    "deploy": "node scripts/deploy-to-ha.js",
+    "deploy:ssh": "node scripts/deploy-to-ha.js --ssh",
+    "ha:test": "node test-ha-full.js",
+    "release": "node scripts/release-hacs.js",
+    "release:minor": "node scripts/release-hacs.js minor",
+    "release:major": "node scripts/release-hacs.js major",
+    "hacs:release": "npm run release",
+    "hacs:check": "node scripts/check-hacs.js"
   },
   "keywords": [
     "home-assistant",
@@ -28,6 +44,7 @@
   "author": "Your Name",
   "license": "MIT",
   "devDependencies": {
+    "@playwright/test": "^1.57.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.5",
@@ -35,14 +52,14 @@
     "@typescript-eslint/eslint-plugin": "^6.7.4",
     "@typescript-eslint/parser": "^6.7.4",
     "eslint": "^8.50.0",
+    "puppeteer": "^24.32.1",
     "rollup": "^4.1.4",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "vitest": "^4.0.18"
   },
   "dependencies": {
-    "@playwright/test": "^1.57.0",
     "custom-card-helpers": "^1.9.0",
-    "lit": "^2.8.0",
-    "puppeteer": "^24.32.1"
+    "lit": "^2.8.0"
   },
   "repository": {
     "type": "git",

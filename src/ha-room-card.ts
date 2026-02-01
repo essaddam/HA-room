@@ -1,8 +1,8 @@
 import { LitElement, html, css, TemplateResult, nothing } from 'lit';
 import { property, state, customElement } from 'lit/decorators.js';
 import { HomeAssistant, LovelaceCardEditor } from 'custom-card-helpers';
-import { CARD_VERSION, CARD_NAME, CARD_EDITOR_NAME, DEFAULT_CONFIG } from './const.js';
-import { HaRoomCardConfig, RoomCardData } from './types.js';
+import { CARD_VERSION, CARD_NAME, CARD_EDITOR_NAME, DEFAULT_CONFIG, logger } from './const.js';
+import { HaRoomCardConfig, RoomCardData, ChangedProperties, CardAction, isNavigateAction, isMoreInfoAction, isCallServiceAction } from './types.js';
 import {
   computeEntityState,
   getNumericState,
@@ -21,9 +21,6 @@ console.info(
   'color: white; font-weight: bold; background: dimgray',
 );
 
-// Test modification for GitHub Actions workflow
-console.log('🚀 GitHub Actions workflow test - modification effectuée');
-
 // Register the card for the UI card picker
 registerCustomCard({
   type: `custom:${CARD_NAME}`,
@@ -31,12 +28,10 @@ registerCustomCard({
   description: 'Custom room card with modern design and interactive features',
 });
 
-// Debug logging to verify registration
-console.log(`[HA Room Card] Registering custom card with type: custom:${CARD_NAME}`);
-console.log(`[HA Room Card] CARD_NAME value: ${CARD_NAME}`);
-console.log(`[HA Room Card] Custom elements defined before registration:`, customElements.get(CARD_NAME));
+logger.log(`[HA Room Card] Registering custom card with type: custom:${CARD_NAME}`);
+logger.log(`[HA Room Card] CARD_NAME value: ${CARD_NAME}`);
 
-@customElement(`custom:${CARD_NAME}`)
+@customElement(CARD_NAME)
 export class HaRoomCard extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
   @property({ attribute: false }) public config!: HaRoomCardConfig;
@@ -44,11 +39,11 @@ export class HaRoomCard extends LitElement {
 
   constructor() {
     super();
-    console.log(`[HA Room Card] Constructor called for element: ${CARD_NAME}`);
+    logger.log(`[HA Room Card] Constructor called for element: ${CARD_NAME}`);
 
     // Ensure the element is properly connected
     this.updateComplete.then(() => {
-      console.log(`[HA Room Card] Element ${CARD_NAME} is now connected and ready`);
+      logger.log(`[HA Room Card] Element ${CARD_NAME} is now connected and ready`);
     });
   }
 
@@ -272,10 +267,10 @@ export class HaRoomCard extends LitElement {
   }
 
   public setConfig(config: HaRoomCardConfig): void {
-    console.log('[HA Room Card] Setting config:', config);
+    logger.log('[HA Room Card] Setting config:', config);
 
     if (!config) {
-      console.error('[HA Room Card] Invalid configuration provided');
+      logger.error('[HA Room Card] Invalid configuration provided');
       throw new Error('Invalid configuration');
     }
 
@@ -283,13 +278,13 @@ export class HaRoomCard extends LitElement {
       ...DEFAULT_CONFIG,
       ...config,
     };
-    console.log('[HA Room Card] Final config:', this.config);
+    logger.log('[HA Room Card] Final config:', this.config);
 
     // Trigger a re-render after config is set
     this.requestUpdate();
   }
 
-  protected willUpdate(changedProperties: Map<string, any>): void {
+  protected willUpdate(changedProperties: ChangedProperties): void {
     // Only update room data if hass or config has changed
     if (changedProperties.has('hass') || changedProperties.has('config')) {
       this._updateRoomData();
@@ -297,10 +292,10 @@ export class HaRoomCard extends LitElement {
   }
 
   private _updateRoomData(): void {
-    console.log('[HA Room Card] Updating room data for:', this.config?.name || 'Unknown room');
+    logger.log('[HA Room Card] Updating room data for:', this.config?.name || 'Unknown room');
 
     if (!this.hass || !this.config) {
-      console.error('[HA Room Card] Missing hass or config');
+      logger.error('[HA Room Card] Missing hass or config');
       return;
     }
 
@@ -308,103 +303,108 @@ export class HaRoomCard extends LitElement {
 
     // Temperature
     if (this.config.temp_entity) {
-      console.log('[HA Room Card] Getting temperature for:', this.config.temp_entity);
+      logger.log('[HA Room Card] Getting temperature for:', this.config.temp_entity);
       try {
         data.temperature = getNumericState(this.hass, this.config.temp_entity);
-        console.log('[HA Room Card] Temperature:', data.temperature);
+        logger.log('[HA Room Card] Temperature:', data.temperature);
       } catch (error) {
-        console.error('[HA Room Card] Error getting temperature:', error);
+        logger.error('[HA Room Card] Error getting temperature:', error);
       }
     }
 
     // Humidity
     if (this.config.hum_entity) {
-      console.log('[HA Room Card] Getting humidity for:', this.config.hum_entity);
+      logger.log('[HA Room Card] Getting humidity for:', this.config.hum_entity);
       try {
         data.humidity = getNumericState(this.hass, this.config.hum_entity);
-        console.log('[HA Room Card] Humidity:', data.humidity);
+        logger.log('[HA Room Card] Humidity:', data.humidity);
       } catch (error) {
-        console.error('[HA Room Card] Error getting humidity:', error);
+        logger.error('[HA Room Card] Error getting humidity:', error);
       }
     }
 
     // Power total
     if (this.config.power_list?.length) {
-      console.log('[HA Room Card] Calculating power for:', this.config.power_list);
+      logger.log('[HA Room Card] Calculating power for:', this.config.power_list);
       try {
         data.power_total = calculateEntityTotals(this.hass, this.config.power_list);
-        console.log('[HA Room Card] Power total:', data.power_total);
+        logger.log('[HA Room Card] Power total:', data.power_total);
       } catch (error) {
-        console.error('[HA Room Card] Error calculating power:', error);
+        logger.error('[HA Room Card] Error calculating power:', error);
       }
     }
 
     // Presence count
     if (this.config.presence_list?.length) {
-      console.log('[HA Room Card] Counting presence for:', this.config.presence_list);
+      logger.log('[HA Room Card] Counting presence for:', this.config.presence_list);
       try {
         data.presence_count = countEntitiesWithState(this.hass, this.config.presence_list, 'on');
-        console.log('[HA Room Card] Presence count:', data.presence_count);
+        logger.log('[HA Room Card] Presence count:', data.presence_count);
       } catch (error) {
-        console.error('[HA Room Card] Error counting presence:', error);
+        logger.error('[HA Room Card] Error counting presence:', error);
       }
     }
 
     // Open count
     if (this.config.open_list?.length) {
-      console.log('[HA Room Card] Counting open entities for:', this.config.open_list);
+      logger.log('[HA Room Card] Counting open entities for:', this.config.open_list);
       try {
         data.open_count = countEntitiesWithState(this.hass, this.config.open_list, 'on');
-        console.log('[HA Room Card] Open count:', data.open_count);
+        logger.log('[HA Room Card] Open count:', data.open_count);
       } catch (error) {
-        console.error('[HA Room Card] Error counting open entities:', error);
+        logger.error('[HA Room Card] Error counting open entities:', error);
       }
     }
 
     // Light counts
     if (this.config.light_list?.length) {
-      console.log('[HA Room Card] Counting lights for:', this.config.light_list);
+      logger.log('[HA Room Card] Counting lights for:', this.config.light_list);
       try {
         data.light_count = this.config.light_list.length;
         data.light_on_count = countEntitiesWithState(this.hass, this.config.light_list, 'on');
-        console.log('[HA Room Card] Light counts:', { total: data.light_count, on: data.light_on_count });
+        logger.log('[HA Room Card] Light counts:', { total: data.light_count, on: data.light_on_count });
       } catch (error) {
-        console.error('[HA Room Card] Error counting lights:', error);
+        logger.error('[HA Room Card] Error counting lights:', error);
       }
     }
 
-    console.log('[HA Room Card] Final room data:', data);
+    logger.log('[HA Room Card] Final room data:', data);
     this.roomData = data;
   }
 
-  private _handleCardAction(): void {
-    console.log('[HA Room Card] Handling card action...');
+  private _isValidNavigationPath(path: string): boolean {
+    // Allow hash-based navigation (most common in HA), absolute paths, or external URLs
+    return /^#[a-zA-Z0-9_-]+$/.test(path) ||
+           /^\//.test(path) ||
+           /^https?:\/\//.test(path);
+  }
 
-    if (!this.config.tap_action || !this.hass) {
-      console.error('[HA Room Card] Missing tap_action or hass:', {
-        tap_action: !!this.config.tap_action,
-        hass: !!this.hass
-      });
+  private _executeAction(action: CardAction | undefined, context: string): void {
+    if (!action || !this.hass) {
+      logger.error(`[HA Room Card] Missing action or hass in ${context}:`, { action: !!action, hass: !!this.hass });
       return;
     }
 
-    const action = this.config.tap_action;
-    console.log('[HA Room Card] Action to handle:', action);
+    logger.log(`[HA Room Card] ${context} executing action:`, action);
 
     // Handle navigation
-    if (action.action === 'navigate' && action.navigation_path) {
-      console.log('[HA Room Card] Navigating to:', action.navigation_path);
+    if (isNavigateAction(action)) {
+      if (!this._isValidNavigationPath(action.navigation_path)) {
+        logger.error(`[HA Room Card] Invalid navigation path:`, action.navigation_path);
+        return;
+      }
+      logger.log(`[HA Room Card] ${context} navigating to:`, action.navigation_path);
       try {
         window.location.href = action.navigation_path;
       } catch (error) {
-        console.error('[HA Room Card] Navigation error:', error);
+        logger.error(`[HA Room Card] ${context} navigation error:`, error);
       }
       return;
     }
 
     // Handle more-info
-    if (action.action === 'more-info' && action.entity) {
-      console.log('[HA Room Card] Showing more info for entity:', action.entity);
+    if (isMoreInfoAction(action)) {
+      logger.log(`[HA Room Card] ${context} showing more info for entity:`, action.entity);
       try {
         const event = new CustomEvent('hass-more-info', {
           bubbles: true,
@@ -413,34 +413,48 @@ export class HaRoomCard extends LitElement {
         });
         this.dispatchEvent(event);
       } catch (error) {
-        console.error('[HA Room Card] More info event error:', error);
+        logger.error(`[HA Room Card] ${context} more info event error:`, error);
       }
       return;
     }
 
     // Handle service calls
-    if (action.action === 'call-service' && action.service) {
-      console.log('[HA Room Card] Calling service:', action.service, 'with data:', action.service_data);
+    if (isCallServiceAction(action)) {
+      logger.log(`[HA Room Card] ${context} calling service:`, action.service, 'with data:', action.service_data);
       try {
         const [domain, service] = action.service.split('.');
-        console.log('[HA Room Card] Parsed service call:', { domain, service });
+        logger.log(`[HA Room Card] ${context} parsed service call:`, { domain, service });
 
         if (!domain || !service) {
-          console.error('[HA Room Card] Invalid service format:', action.service);
+          logger.error(`[HA Room Card] ${context} invalid service format:`, action.service);
           return;
         }
 
         this.hass.callService(domain, service, action.service_data || {});
-        console.log('[HA Room Card] Service call initiated successfully');
+        logger.log(`[HA Room Card] ${context} service call initiated successfully`);
       } catch (error) {
-        console.error('[HA Room Card] Service call error:', error);
+        logger.error(`[HA Room Card] ${context} service call error:`, error);
       }
     } else {
-      console.warn('[HA Room Card] Unknown action type or missing service:', action);
+      logger.warn(`[HA Room Card] ${context} unknown action type or missing service:`, action);
     }
   }
 
-  private _renderChip(icon: string, color: string, content: string, action?: any, entity?: string): TemplateResult {
+  private _handleCardAction(): void {
+    logger.log('[HA Room Card] Handling card action...');
+
+    if (!this.config.tap_action || !this.hass) {
+      logger.error('[HA Room Card] Missing tap_action or hass:', {
+        tap_action: !!this.config.tap_action,
+        hass: !!this.hass
+      });
+      return;
+    }
+
+    this._executeAction(this.config.tap_action, 'card');
+  }
+
+  private _renderChip(icon: string, color: string, content: string, action?: CardAction, entity?: string): TemplateResult {
     return html`
       <div 
         class="chip" 
@@ -453,60 +467,13 @@ export class HaRoomCard extends LitElement {
     `;
   }
 
-  private _handleChipAction(action: any, entity?: string): void {
-    console.log('[HA Room Card] Handling chip action:', { action, entity });
-
-    if (!action || !this.hass) {
-      console.error('[HA Room Card] Missing action or hass for chip:', { action: !!action, hass: !!this.hass });
-      return;
-    }
-
-    // Handle navigation
-    if (action.action === 'navigate' && action.navigation_path) {
-      console.log('[HA Room Card] Chip navigating to:', action.navigation_path);
-      try {
-        window.location.href = action.navigation_path;
-      } catch (error) {
-        console.error('[HA Room Card] Chip navigation error:', error);
-      }
-      return;
-    }
-
-    // Handle more-info
-    if (action.action === 'more-info' && entity) {
-      console.log('[HA Room Card] Chip showing more info for entity:', entity);
-      try {
-        const event = new CustomEvent('hass-more-info', {
-          bubbles: true,
-          composed: true,
-          detail: { entityId: entity },
-        });
-        this.dispatchEvent(event);
-      } catch (error) {
-        console.error('[HA Room Card] Chip more info event error:', error);
-      }
-      return;
-    }
-
-    // Handle service calls
-    if (action.action === 'call-service' && action.service) {
-      console.log('[HA Room Card] Chip calling service:', action.service, 'with data:', action.service_data);
-      try {
-        const [domain, service] = action.service.split('.');
-        console.log('[HA Room Card] Chip parsed service call:', { domain, service });
-
-        if (!domain || !service) {
-          console.error('[HA Room Card] Chip invalid service format:', action.service);
-          return;
-        }
-
-        this.hass.callService(domain, service, action.service_data || {});
-        console.log('[HA Room Card] Chip service call initiated successfully');
-      } catch (error) {
-        console.error('[HA Room Card] Chip service call error:', error);
-      }
+  private _handleChipAction(action: CardAction | undefined, entity?: string): void {
+    // Pass entity as action.entity if provided for more-info actions
+    if (entity && action) {
+      const actionWithEntity: CardAction = { ...action, entity } as CardAction;
+      this._executeAction(actionWithEntity, 'chip');
     } else {
-      console.warn('[HA Room Card] Chip unknown action type or missing service:', action);
+      this._executeAction(action, 'chip');
     }
   }
 
@@ -586,7 +553,7 @@ export class HaRoomCard extends LitElement {
     title: string,
     subtitle: string,
     icon: string,
-    action: any,
+    action: CardAction,
     type: 'primary' | 'secondary' | 'tertiary' = 'primary',
     coverImage?: string
   ): TemplateResult {
@@ -605,31 +572,8 @@ export class HaRoomCard extends LitElement {
     `;
   }
 
-  private _handleButtonAction(action: any): void {
-    if (!action || !this.hass) return;
-
-    // Handle navigation
-    if (action.action === 'navigate' && action.navigation_path) {
-      window.location.href = action.navigation_path;
-      return;
-    }
-
-    // Handle more-info
-    if (action.action === 'more-info' && action.entity) {
-      const event = new CustomEvent('hass-more-info', {
-        bubbles: true,
-        composed: true,
-        detail: { entityId: action.entity },
-      });
-      this.dispatchEvent(event);
-      return;
-    }
-
-    // Handle service calls
-    if (action.action === 'call-service' && action.service) {
-      const [domain, service] = action.service.split('.');
-      this.hass.callService(domain, service, action.service_data || {});
-    }
+  private _handleButtonAction(action: CardAction): void {
+    this._executeAction(action, 'button');
   }
 
   private _renderLightsButton(): TemplateResult {
@@ -730,22 +674,23 @@ export class HaRoomCard extends LitElement {
   }
 
   protected render(): TemplateResult {
-    console.log('[HA Room Card] Render called - config:', !!this.config, 'hass:', !!this.hass);
+    logger.log('[HA Room Card] Render called - config:', !!this.config, 'hass:', !!this.hass);
 
     if (!this.config) {
-      console.error('[HA Room Card] Missing config in render');
+      logger.error('[HA Room Card] Missing config in render');
       return html`<ha-card><div class="error">Configuration manquante</div></ha-card>`;
     }
 
     if (!this.hass) {
-      console.error('[HA Room Card] Missing hass in render');
+      logger.error('[HA Room Card] Missing hass in render');
       return html`<ha-card><div class="error">Home Assistant non disponible</div></ha-card>`;
     }
 
     // Support for Home Assistant 2025.12 theme variables
-    const themes = this.hass.themes as any;
-    const primaryColor = themes?.primaryColor || '#03a9f4';
-    const textColor = themes?.textColor || '#ffffff';
+    // Get the current theme or fall back to default theme properties
+    const currentTheme = this.hass.themes?.themes?.[this.hass.themes.default_theme];
+    const primaryColor = currentTheme?.['primary-color'] ?? '#03a9f4';
+    const textColor = currentTheme?.['text-primary-color'] ?? '#ffffff';
 
     return html`
       <ha-card

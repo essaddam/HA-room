@@ -1,4 +1,5 @@
 import puppeteer from 'puppeteer';
+import { TEST_CREDENTIALS } from './test-credentials.js';
 
 async function testOAuthFlow() {
     console.log('🔐 Test du flux OAuth complet...');
@@ -168,8 +169,8 @@ async function testOAuthFlow() {
             if (formAnalysis.inputCount >= 2) {
                 console.log('🚀 Tentative de connexion avec identifiants standards...');
                 
-                await page.type('input[name="username"]', 'dev');
-                await page.type('input[name="password"]', 'Dev@2017!');
+                await page.type('input[name="username"]', TEST_CREDENTIALS.username);
+                await page.type('input[name="password"]', TEST_CREDENTIALS.password);
                 
                 await page.screenshot({ path: 'tests-reports/oauth-5-credentials-entered.png', fullPage: true });
                 

@@ -1,6 +1,7 @@
 import puppeteer from 'puppeteer';
+import { TEST_CREDENTIALS } from './test-credentials.js';
 
-async function testHARoomEditor() {
+async function testHARoomEditorFixed() {
     console.log('🚀 Test final de l\'éditeur ha-room installé...');
     
     let browser;
@@ -21,8 +22,8 @@ async function testHARoomEditor() {
         
         await new Promise(resolve => setTimeout(resolve, 3000));
         
-        await page.type('input[name="username"]', 'dev');
-        await page.type('input[name="password"]', 'Dev@2017!');
+        await page.type('input[name="username"]', TEST_CREDENTIALS.username);
+        await page.type('input[name="password"]', TEST_CREDENTIALS.password);
         
         const submitButton = await page.$('button');
         if (submitButton) {
@@ -41,35 +42,28 @@ async function testHARoomEditor() {
                 s.src.includes('ha-room') || s.src.includes('hacsfiles')
             );
             
-            // Vérifier les éléments personnalisés
-            const customElements = window.customCards || [];
-            const haRoomCard = customElements.find(card => 
-                card.type && card.type.includes('ha-room')
-            );
+            // Vérifier si ha-room est dans le DOM
+            const haRoomElements = Array.from(document.querySelectorAll('*'));
+            const hasHARoomElements = haRoomElements.some(el => {
+                const text = el.textContent || el.innerText || '';
+                return text.toLowerCase().includes('ha-room') && !text.toLowerCase().includes('script');
+            });
             
             return {
                 haRoomScriptFound: !!haRoomScript,
                 haRoomScriptUrl: haRoomScript ? haRoomScript.src : null,
-                haRoomCardRegistered: !!haRoomCard,
-                totalCustomCards: customElements.length,
-                allCustomCards: customCards
+                hasHARoomElements: hasHARoomElements,
+                totalScripts: scripts.length
             };
         });
         
         console.log('📊 Analyse de l\'installation:');
         console.log(`   Script ha-room trouvé: ${pageAnalysis.haRoomScriptFound}`);
-        console.log(`   Carte ha-room enregistrée: ${pageAnalysis.haRoomCardRegistered}`);
-        console.log(`   Total cartes personnalisées: ${pageAnalysis.totalCustomCards}`);
+        console.log(`   Éléments ha-room trouvés: ${pageAnalysis.hasHARoomElements}`);
+        console.log(`   Total scripts: ${pageAnalysis.totalScripts}`);
         
         if (pageAnalysis.haRoomScriptFound) {
             console.log(`   URL du script: ${pageAnalysis.haRoomScriptUrl}`);
-        }
-        
-        if (pageAnalysis.allCustomCards.length > 0) {
-            console.log('   Cartes disponibles:');
-            pageAnalysis.allCustomCards.forEach((card, index) => {
-                console.log(`     ${index + 1}. ${card.type} - ${card.name}`);
-            });
         }
         
         await page.screenshot({ path: 'tests-reports/final1-ha-room-installed.png', fullPage: true });
@@ -107,10 +101,10 @@ async function testHARoomEditor() {
             console.log('🔍 Recherche de ha-room dans le sélecteur de cartes...');
             
             const haRoomCard = await page.evaluate(() => {
-                const cards = Array.from(document.querySelectorAll('ha-card-picker .card, .card-type, [data-card-type], paper-item, mwc-list-item'));
+                const cards = Array.from(document.querySelectorAll('ha-card-picker .card, .card-type, [data-card-type], paper-item, mwc-list-item, ha-list-item'));
                 for (const card of cards) {
                     const text = card.textContent || card.innerText || '';
-                    if (text.toLowerCase().includes('ha-room') || text.toLowerCase().includes('room')) {
+                    if (text.toLowerCase().includes('ha-room') || (text.toLowerCase().includes('room') && !text.toLowerCase().includes('weather'))) {
                         return card;
                     }
                 }
@@ -118,7 +112,7 @@ async function testHARoomEditor() {
             });
             
             if (haRoomCard) {
-                console.log('✅ Carte ha-room trouvée dans le sélecteur!');
+                console.log('✅ Carte ha-room trouvée!');
                 await page.evaluate((card) => card.click(), haRoomCard);
                 await new Promise(resolve => setTimeout(resolve, 3000));
                 
@@ -127,7 +121,7 @@ async function testHARoomEditor() {
                 
                 // Analyser l'éditeur
                 const editorAnalysis = await page.evaluate(() => {
-                    const editor = document.querySelector('ha-editor, .ha-editor, [data-editor], .editor-form');
+                    const editor = document.querySelector('ha-editor, .ha-editor, [data-editor], .editor-form, .card-editor');
                     if (editor) {
                         const inputs = editor.querySelectorAll('input, select, ha-textfield, ha-form-field, paper-input, paper-dropdown-menu');
                         const buttons = editor.querySelectorAll('button, ha-button, mwc-button');
@@ -207,9 +201,9 @@ async function testHARoomEditor() {
             } else {
                 console.log('❌ Carte ha-room non trouvée dans le sélecteur');
                 
-                // Afficher toutes les cartes disponibles
+                // Afficher toutes les cartes disponibles pour diagnostic
                 const availableCards = await page.evaluate(() => {
-                    const cards = Array.from(document.querySelectorAll('ha-card-picker .card, .card-type, [data-card-type], paper-item, mwc-list-item'));
+                    const cards = Array.from(document.querySelectorAll('ha-card-picker .card, .card-type, [data-card-type], paper-item, mwc-list-item, ha-list-item'));
                     return cards.map(card => ({
                         text: (card.textContent || card.innerText || '').trim(),
                         type: card.getAttribute('data-card-type') || card.tagName
@@ -246,4 +240,4 @@ async function testHARoomEditor() {
     }
 }
 
-testHARoomEditor();
+testHARoomEditorFixed();

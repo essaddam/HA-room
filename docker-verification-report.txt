@@ -1,0 +1,21 @@
+=== RAPPORT DE VÉRIFICATION DOCKER ===
+Projet: ha-room-card
+Date: Wed Dec 10 20:10:29 CET 2025
+========================================
+
+Fichier JavaScript:
+- Taille: 231740 octets
+- Présent: Oui
+
+Configuration Home Assistant:
+- Présente: Oui
+- server_host: Absent (correct)
+
+Environnement Docker:
+- Docker: Installé
+- Docker Compose: Installé
+
+Accessibilité Home Assistant:
+- Statut: Accessible
+
+Résultat global: ✅ SUCCÈS

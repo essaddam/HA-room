@@ -3,6 +3,17 @@ export const CARD_VERSION = '1.47.2';
 export const CARD_NAME = 'ha-room-card';
 export const CARD_EDITOR_NAME = 'ha-room-card-editor';
 
+// Debug mode - enabled only in development
+export const DEBUG = typeof process !== 'undefined' && process.env?.NODE_ENV === 'development';
+
+// Conditional logger
+export const logger = {
+  log: (...args: unknown[]) => DEBUG && console.log(...args),
+  warn: (...args: unknown[]) => DEBUG && console.warn(...args),
+  error: (...args: unknown[]) => console.error(...args), // Always log errors
+  info: (...args: unknown[]) => DEBUG && console.info(...args),
+};
+
 
 // Configuration constants
 export const DEFAULT_CONFIG = {

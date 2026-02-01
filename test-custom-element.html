@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HA Room Card - Custom Element Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        ha-room-card {
+            display: block;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>HA Room Card - Custom Element Test</h1>
+        <div id="status" class="status">Testing custom element registration...</div>
+        
+        <h2>Test Results:</h2>
+        <div id="test-results"></div>
+        
+        <h2>Custom Element:</h2>
+        <div id="custom-element-container"></div>
+    </div>
+
+    <script src="dist/ha-room-card.js"></script>
+    <script>
+        // Test function to verify custom element registration
+        function testCustomElement() {
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('test-results');
+            const containerDiv = document.getElementById('custom-element-container');
+            
+            let results = [];
+            
+            // Test 1: Check if custom element is defined
+            const isDefined = customElements.get('ha-room-card');
+            results.push(`✅ Custom element 'ha-room-card' defined: ${isDefined ? 'YES' : 'NO'}`);
+            
+            // Test 2: Check if custom element with 'custom:' prefix is defined
+            const isCustomDefined = customElements.get('custom:ha-room-card');
+            results.push(`✅ Custom element 'custom:ha-room-card' defined: ${isCustomDefined ? 'YES' : 'NO'}`);
+            
+            // Test 3: Try to create an instance
+            try {
+                const instance = document.createElement('ha-room-card');
+                results.push(`✅ Successfully created instance: ${instance.constructor.name}`);
+                
+                // Test 4: Check if it has the correct class
+                if (instance && instance.constructor && instance.constructor.name === 'HaRoomCard') {
+                    results.push(`✅ Instance has correct class: ${instance.constructor.name}`);
+                } else {
+                    results.push(`❌ Instance class mismatch: ${instance?.constructor?.name || 'unknown'}`);
+                }
+                
+                // Add to DOM to test rendering
+                containerDiv.appendChild(instance);
+                results.push(`✅ Instance added to DOM successfully`);
+                
+            } catch (error) {
+                results.push(`❌ Failed to create instance: ${error.message}`);
+            }
+            
+            // Update status
+            if (isDefined && isCustomDefined) {
+                statusDiv.className = 'status success';
+                statusDiv.textContent = '✅ Custom element registration successful!';
+            } else {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = '❌ Custom element registration failed!';
+            }
+            
+            // Display results
+            resultsDiv.innerHTML = results.map(result => `<div>${result}</div>`).join('');
+            
+            console.log('Custom Element Test Results:', results);
+        }
+        
+        // Run test after page loads
+        document.addEventListener('DOMContentLoaded', testCustomElement);
+        
+        // Also test immediately in case DOM is already loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', testCustomElement);
+        } else {
+            testCustomElement();
+        }
+    </script>
+</body>
+</html>

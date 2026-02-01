@@ -1,15 +1,16 @@
 import { LitElement, html, css, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { HomeAssistant } from 'custom-card-helpers';
+
+interface PopupConfig {
+  icon?: string;
+  title?: string;
+}
 
 @customElement('popup-base')
 export class PopupBase extends LitElement {
-  @property({ attribute: false }) public hass!: any;
-  @property({ attribute: false }) public config: any = {};
-
-  // Support for Home Assistant 2025.12 theme integration
-  protected willUpdate(): void {
-    // Theme integration handled in parent component
-  }
+  @property({ attribute: false }) public hass!: HomeAssistant;
+  @property({ attribute: false }) public config: PopupConfig = {};
 
   static get styles() {
     return css`

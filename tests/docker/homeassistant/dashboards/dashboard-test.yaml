@@ -1,0 +1,80 @@
+title: Test Dashboard
+path: dashboard-test
+icon: mdi:home-assistant
+badges: []
+cards:
+  # HA Room Card Test
+  - type: custom:ha-room-card
+    room_name: Salon Test
+    title: "Salon Principal"
+    entities:
+      - entity: light.test_light_1
+        name: "Lumière Salon 1"
+        icon: mdi:ceiling-light
+        tap_action:
+          action: toggle
+        hold_action:
+          action: more-info
+      - entity: light.test_light_2
+        name: "Lumière Salon 2"
+        icon: mdi:lamp
+        tap_action:
+          action: toggle
+      - entity: sensor.test_temperature
+        name: "Température"
+        icon: mdi:thermometer
+      - entity: sensor.test_humidity
+        name: "Humidité"
+        icon: mdi:water-percent
+      - entity: binary_sensor.test_presence
+        name: "Présence"
+        icon: mdi:motion-sensor
+      - entity: binary_sensor.test_door
+        name: "Porte"
+        icon: mdi:door
+    entity_types:
+      lights: true
+      switches: true
+      sensors: true
+      binary_sensors: true
+    show_entity_count: true
+    compact_view: false
+    theme_colors:
+      primary: "#2196F3"
+      secondary: "#FFC107"
+      background: "#FAFAFA"
+
+  # Additional test card for comparison
+  - type: entities
+    title: "Entités de Test"
+    show_header_toggle: false
+    entities:
+      - entity: light.test_light_1
+        name: "Lumière Test 1"
+      - entity: light.test_light_2
+        name: "Lumière Test 2"
+      - entity: sensor.test_temperature
+        name: "Température Test"
+      - entity: sensor.test_humidity
+        name: "Humidité Test"
+      - entity: binary_sensor.test_presence
+        name: "Présence Test"
+      - entity: binary_sensor.test_door
+        name: "Porte Test"
+
+  # Info card
+  - type: markdown
+    title: "Tableau de Bord de Test"
+    content: |
+      ## HA Room Card Test Dashboard
+      
+      Ce tableau de bord contient des cartes de test pour le composant **ha-room-card**.
+      
+      ### Fonctionnalités testées:
+      - Affichage des lumières
+      - Capteurs de température et humidité
+      - Capteurs binaires (présence, porte)
+      - Actions personnalisées
+      - Thème personnalisé
+      
+      **URL:** http://localhost:8123/dashboard-test/0?edit=1

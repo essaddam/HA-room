@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard Editor Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .loading { background-color: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+    </style>
+</head>
+<body>
+    <h1>Home Assistant Dashboard Editor Test</h1>
+    
+    <div id="test-results">
+        <div class="loading">Testing dashboard accessibility...</div>
+    </div>
+
+    <script>
+        const results = document.getElementById('test-results');
+        
+        function addResult(message, type) {
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.textContent = message;
+            results.appendChild(div);
+        }
+
+        // Test 1: Check if Home Assistant is accessible
+        async function testHomeAssistantAccess() {
+            try {
+                const response = await fetch('http://localhost:8123/');
+                if (response.ok) {
+                    addResult('✓ Home Assistant is accessible at http://localhost:8123', 'success');
+                } else {
+                    addResult(`✗ Home Assistant returned status: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addResult(`✗ Cannot access Home Assistant: ${error.message}`, 'error');
+            }
+        }
+
+        // Test 2: Check dashboard URL
+        async function testDashboardAccess() {
+            try {
+                const response = await fetch('http://localhost:8123/dashboard-test/0?edit=1');
+                if (response.ok) {
+                    addResult('✓ Dashboard editor URL is accessible: http://localhost:8123/dashboard-test/0?edit=1', 'success');
+                } else {
+                    addResult(`✗ Dashboard returned status: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addResult(`✗ Cannot access dashboard: ${error.message}`, 'error');
+            }
+        }
+
+        // Test 3: Check if ha-room-card is accessible
+        async function testHaRoomCardAccess() {
+            try {
+                const response = await fetch('http://localhost:8123/local/community/ha-room-card/ha-room-card.js');
+                if (response.ok) {
+                    addResult('✓ ha-room-card.js is accessible via /local/community/ha-room-card/ha-room-card.js', 'success');
+                } else {
+                    addResult(`✗ ha-room-card.js returned status: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addResult(`✗ Cannot access ha-room-card.js: ${error.message}`, 'error');
+            }
+        }
+
+        // Test 4: Check if ha-room-card is properly configured
+        async function testHaRoomCardConfig() {
+            try {
+                // Try to access the card file and check if it's valid JavaScript
+                const response = await fetch('http://localhost:8123/local/community/ha-room-card/ha-room-card.js');
+                const content = await response.text();
+                
+                if (content.includes('customElements.define') && content.includes('ha-room-card')) {
+                    addResult('✓ ha-room-card appears to be properly defined as a custom element', 'success');
+                } else {
+                    addResult('⚠ ha-room-card file structure may need verification', 'info');
+                }
+                
+                if (content.includes('window.customCards')) {
+                    addResult('✓ ha-room-card is registered with window.customCards', 'success');
+                } else {
+                    addResult('⚠ ha-room-card may not be properly registered for the card picker', 'info');
+                }
+            } catch (error) {
+                addResult(`✗ Error checking ha-room-card configuration: ${error.message}`, 'error');
+            }
+        }
+
+        // Run all tests
+        async function runTests() {
+            addResult('Starting Dashboard Editor Test Suite...', 'info');
+            
+            await testHomeAssistantAccess();
+            await testDashboardAccess();
+            await testHaRoomCardAccess();
+            await testHaRoomCardConfig();
+            
+            addResult('Test suite completed. You can now open http://localhost:8123/dashboard-test/0?edit=1 in your browser to access the dashboard editor.', 'info');
+        }
+
+        // Run tests when page loads
+        runTests();
+    </script>
+</body>
+</html>

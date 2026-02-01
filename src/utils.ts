@@ -1,15 +1,16 @@
 import { HomeAssistant } from 'custom-card-helpers';
 import { EntityState, ThresholdEntry, OPERATORS } from './types';
+import { logger } from './const.js';
 
 export function computeEntityState(hass: HomeAssistant, entityId: string): EntityState | null {
   if (!hass || !hass.states) {
-    console.warn('[Utils] Home Assistant instance or states not available');
+    logger.warn('[Utils] Home Assistant instance or states not available');
     return null;
   }
 
   const stateObj = hass.states[entityId];
   if (!stateObj) {
-    console.warn('[Utils] Entity not found:', entityId);
+    logger.warn('[Utils] Entity not found:', entityId);
     return null;
   }
 
@@ -29,7 +30,7 @@ export function isEntityOn(hass: HomeAssistant, entityId: string): boolean {
   return state.state === 'on' || state.state === 'true' || state.state === 'home';
 }
 
-export function getEntityAttributeValue(hass: HomeAssistant, entityId: string, attribute: string): any {
+export function getEntityAttributeValue(hass: HomeAssistant, entityId: string, attribute: string): unknown {
   const state = computeEntityState(hass, entityId);
   return state?.attributes[attribute];
 }
@@ -37,13 +38,13 @@ export function getEntityAttributeValue(hass: HomeAssistant, entityId: string, a
 export function getNumericState(hass: HomeAssistant, entityId: string): number {
   const state = computeEntityState(hass, entityId);
   if (!state) {
-    console.warn('[Utils] No state for entity, returning 0:', entityId);
+    logger.warn('[Utils] No state for entity, returning 0:', entityId);
     return 0;
   }
 
   const num = parseFloat(state.state);
   if (isNaN(num)) {
-    console.warn('[Utils] State not numeric for entity, returning 0:', entityId, 'value:', state.state);
+    logger.warn('[Utils] State not numeric for entity, returning 0:', entityId, 'value:', state.state);
     return 0;
   }
 
@@ -86,7 +87,7 @@ export function evaluateThreshold(
 
 export function calculateEntityTotals(hass: HomeAssistant, entityIds: string[]): number {
   if (!Array.isArray(entityIds)) {
-    console.error('[Utils] entityIds is not an array:', entityIds);
+    logger.error('[Utils] entityIds is not an array:', entityIds);
     return 0;
   }
 
@@ -95,7 +96,7 @@ export function calculateEntityTotals(hass: HomeAssistant, entityIds: string[]):
     return runningTotal + entityValue;
   }, 0);
 
-  console.log('[Utils] Total calculated for entities:', entityIds, 'total:', total);
+  logger.log('[Utils] Total calculated for entities:', entityIds, 'total:', total);
   return total;
 }
 
@@ -105,7 +106,7 @@ export function countEntitiesWithState(
   targetState: string = 'on'
 ): number {
   if (!Array.isArray(entityIds)) {
-    console.error('[Utils] entityIds is not an array:', entityIds);
+    logger.error('[Utils] entityIds is not an array:', entityIds);
     return 0;
   }
 
@@ -114,7 +115,7 @@ export function countEntitiesWithState(
     return state?.state === targetState;
   }).length;
 
-  console.log('[Utils] Counted entities with state', targetState, ':', count, 'from', entityIds.length, 'entities');
+  logger.log('[Utils] Counted entities with state', targetState, ':', count, 'from', entityIds.length, 'entities');
   return count;
 }
 
@@ -164,15 +165,29 @@ interface RegisterCardParams {
   description: string;
 }
 
-export function registerCustomCard(params: RegisterCardParams) {
-  const windowWithCards = window as unknown as Window & {
-    customCards: unknown[];
-  };
-  windowWithCards.customCards = windowWithCards.customCards || [];
+interface CustomCardInfo {
+  type: string;
+  name: string;
+  description: string;
+  preview: boolean;
+  documentationURL: string;
+  schemaURL: string;
+}
 
-  windowWithCards.customCards.push({
+interface WindowWithCustomCards extends Window {
+  customCards?: CustomCardInfo[];
+}
+
+
+export function registerCustomCard(params: RegisterCardParams): void {
+  const win = window as WindowWithCustomCards;
+
+  win.customCards = win.customCards ?? [];
+
+  win.customCards.push({
     ...params,
     preview: true,
-    documentationURL: `https://github.com/essaddam/HA-room#readme`,
+    documentationURL: 'https://github.com/essaddam/HA-room#readme',
+    schemaURL: '/hacsfiles/ha-room-card/ha-room-card-schema.json',
   });
 }

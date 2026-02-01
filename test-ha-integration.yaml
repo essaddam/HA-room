@@ -1,0 +1,47 @@
+# Home Assistant configuration for testing HA Room Card
+# Add this to your configuration.yaml or create a test configuration
+
+# Test card configuration
+type: custom:ha-room-card
+name: "Salon Test"
+icon: "mdi:home"
+icon_color: "#ffffff"
+bg_start: "#667eea"
+bg_end: "#764ba2"
+
+# Example entities (replace with your actual entities)
+temp_entity: "sensor.temperature_salon"
+hum_entity: "sensor.humidity_salon"
+power_list:
+  - "sensor.power_salon_total"
+light_list:
+  - "light.salon_main"
+  - "light.salon_ambiance"
+presence_list:
+  - "binary_sensor.motion_salon"
+open_list:
+  - "binary_sensor.window_salon"
+
+# Navigation hashes (optional)
+lights_hash: "#lights"
+plugs_hash: "#plugs"
+covers_hash: "#covers"
+presence_hash: "#presence"
+open_hash: "#open"
+audio_hash: "#audio"
+video_hash: "#video"
+cameras_hash: "#cameras"
+
+# Media entities (optional)
+audio_cover_entity: "media_player.salon"
+video_cover_entity: "media_player.tv_salon"
+
+# Customization
+covers_label: "Volets Salon"
+extra_chips:
+  - icon: "mdi:thermometer"
+    icon_color: "orange"
+    content: "Test Chip"
+    tap_action:
+      action: "more-info"
+      entity: "sensor.temperature_salon"

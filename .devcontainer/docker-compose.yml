@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  homeassistant:
+    image: homeassistant/home-assistant:2025.12
+    container_name: ha-room-test
+    restart: unless-stopped
+    privileged: true
+    network_mode: host
+    volumes:
+      - ./tests/docker/homeassistant:/config
+      - ./dist:/config/www/community/ha-room-card:ro
+    environment:
+      - TZ=Europe/Paris
+
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ..:/workspace:cached
+    command: sleep infinity
+    network_mode: host

@@ -2,11 +2,12 @@ import { html, css, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { PopupBase } from './popup-base.js';
 import { calculateEntityTotals, getFriendlyName, getIcon, isEntityOn, getNumericState, formatPower } from '../utils.js';
+import { logger } from '../const.js';
 
 @customElement('plugs-popup')
 export class PlugsPopup extends PopupBase {
   @property({ attribute: false }) public entities!: string[];
-  @property({ attribute: false }) public powerList!: string[];
+  @property({ attribute: false }) public power_list!: string[];
 
   static get styles() {
     return css`
@@ -118,8 +119,8 @@ export class PlugsPopup extends PopupBase {
   }
 
   protected renderBody(): TemplateResult {
-    const totalPower = this.powerList?.length ? 
-      calculateEntityTotals(this.hass, this.powerList) : 0;
+    const totalPower = this.power_list?.length ?
+      calculateEntityTotals(this.hass, this.power_list) : 0;
 
     return html`
       <!-- Total Power Display -->
@@ -161,11 +162,15 @@ export class PlugsPopup extends PopupBase {
   }
 
   private _toggleEntity(entityId: string): void {
-    const domain = entityId.split('.')[0];
-    const isOn = isEntityOn(this.hass, entityId);
-    
-    this.hass.callService(domain, isOn ? 'turn_off' : 'turn_on', {
-      entity_id: entityId
-    });
+    try {
+      const domain = entityId.split('.')[0];
+      const isOn = isEntityOn(this.hass, entityId);
+
+      this.hass.callService(domain, isOn ? 'turn_off' : 'turn_on', {
+        entity_id: entityId
+      });
+    } catch (error) {
+      logger.error('[Plugs Popup] Error toggling entity:', entityId, error);
+    }
   }
 }

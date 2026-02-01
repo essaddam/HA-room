@@ -207,6 +207,36 @@ npm run lint
 npm run typecheck
 ```
 
+## 🧪 Développement et Tests
+
+### Environnement Docker
+
+Pour tester l'intégration dans un vrai Home Assistant :
+
+```bash
+# Démarrer l'environnement
+npm run docker:up
+
+# Builder la carte
+npm run build
+
+# Lancer les tests E2E
+npm run test:e2e
+```
+
+Accédez à Home Assistant sur http://localhost:8123 (dev / Dev@2017!)
+
+### Tests manuels
+
+1. Ouvrir http://localhost:8123
+2. Aller dans Configuration → Tableaux de bord
+3. Ajouter une carte "HA Room Card"
+4. Vérifier que l'éditeur s'ouvre sans erreur
+
+### Développement avec devcontainer
+
+Ouvrir le projet dans VS Code et sélectionner "Reopen in Container" pour un environnement complet.
+
 ## Structure du projet
 
 ```

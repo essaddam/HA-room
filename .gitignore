@@ -89,3 +89,12 @@ tests-reports/
 
 
 temp/
+
+# Docker volumes
+.devcontainer/homeassistant/
+tests/docker/homeassistant/.storage/
+tests/docker/homeassistant/home-assistant.log
+
+# Test artifacts
+test-results/
+playwright-report/

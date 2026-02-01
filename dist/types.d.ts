@@ -36,8 +36,8 @@ export interface HaRoomCardConfig extends LovelaceCard {
     hold_action?: ActionConfig;
     double_tap_action?: ActionConfig;
 }
+export type NavigationPath = `#${string}` | `/${string}` | `https://${string}` | `http://${string}`;
 export interface EntityChipConfig {
-    type: 'template';
     icon: string;
     icon_color: string;
     content: string;

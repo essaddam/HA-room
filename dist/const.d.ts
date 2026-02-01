@@ -1,6 +1,13 @@
-export declare const CARD_VERSION = "1.47.1";
+export declare const CARD_VERSION = "1.47.2";
 export declare const CARD_NAME = "ha-room-card";
 export declare const CARD_EDITOR_NAME = "ha-room-card-editor";
+export declare const DEBUG: boolean;
+export declare const logger: {
+    log: (...args: unknown[]) => false | void;
+    warn: (...args: unknown[]) => false | void;
+    error: (...args: unknown[]) => void;
+    info: (...args: unknown[]) => false | void;
+};
 export declare const DEFAULT_CONFIG: {
     name: string;
     icon: string;

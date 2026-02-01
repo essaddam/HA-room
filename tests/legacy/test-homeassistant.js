@@ -1,4 +1,5 @@
 import puppeteer from 'puppeteer';
+import { TEST_CREDENTIALS } from './test-credentials.js';
 
 async function testHomeAssistant() {
     console.log('🚀 Démarrage du test de Home Assistant...');
@@ -74,7 +75,7 @@ async function testHomeAssistant() {
             const element = await page.$(selector);
             if (element) {
                 console.log(`✅ Champ username trouvé avec: ${selector}`);
-                await element.type('dev');
+                await element.type(TEST_CREDENTIALS.username);
                 usernameFound = true;
                 break;
             }
@@ -84,7 +85,7 @@ async function testHomeAssistant() {
             const element = await page.$(selector);
             if (element) {
                 console.log(`✅ Champ password trouvé avec: ${selector}`);
-                await element.type('Dev@2017!');
+                await element.type(TEST_CREDENTIALS.password);
                 passwordFound = true;
                 break;
             }

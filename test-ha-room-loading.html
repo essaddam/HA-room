@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HA-Room Card Loading Test</title>
+</head>
+<body>
+    <h1>HA-Room Card Loading Test</h1>
+    <div id="status">Loading ha-room card...</div>
+    
+    <!-- Load the ha-room card from Home Assistant -->
+    <script type="module" src="http://localhost:8123/local/community/ha-room-card/ha-room-card.js"></script>
+    
+    <script>
+        setTimeout(() => {
+            const statusDiv = document.getElementById('status');
+            
+            // Check if the custom element is registered
+            if (customElements.get('ha-room-card')) {
+                statusDiv.innerHTML = '<span style="color: green;">✅ SUCCESS: ha-room-card is registered and available!</span>';
+                
+                // Try to create an instance
+                try {
+                    const card = document.createElement('ha-room-card');
+                    card.setConfig({
+                        type: 'ha-room-card',
+                        entity: 'sensor.test_temperature'
+                    });
+                    document.body.appendChild(card);
+                    statusDiv.innerHTML += '<br><span style="color: green;">✅ Card instance created successfully!</span>';
+                } catch (error) {
+                    statusDiv.innerHTML += '<br><span style="color: orange;">⚠️ Card registered but instance creation failed: ' + error.message + '</span>';
+                }
+            } else {
+                statusDiv.innerHTML = '<span style="color: red;">❌ FAILED: ha-room-card is not registered</span>';
+            }
+        }, 2000);
+    </script>
+</body>
+</html>

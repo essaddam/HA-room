@@ -1,4 +1,5 @@
 import puppeteer from 'puppeteer';
+import { TEST_CREDENTIALS } from './test-credentials.js';
 
 async function testHomeAssistantFeatures() {
     console.log('🚀 Démarrage du test complet des fonctionnalités Home Assistant...');
@@ -21,9 +22,9 @@ async function testHomeAssistantFeatures() {
         
         await new Promise(resolve => setTimeout(resolve, 3000));
         
-        // Remplir les identifiants
-        await page.type('input[name="username"]', 'dev');
-        await page.type('input[name="password"]', 'Dev@2017!');
+        // Remplir les identifiants de test
+        await page.type('input[name="username"]', TEST_CREDENTIALS.username);
+        await page.type('input[name="password"]', TEST_CREDENTIALS.password);
         
         // Cliquer sur le bouton de connexion
         const submitButton = await page.$('button');
