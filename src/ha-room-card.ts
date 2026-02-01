@@ -1,5 +1,5 @@
 import { LitElement, html, css, TemplateResult, nothing } from 'lit';
-import { property, state, customElement } from 'lit/decorators.js';
+import { property, state } from 'lit/decorators.js';
 import { HomeAssistant, LovelaceCardEditor } from 'custom-card-helpers';
 import { CARD_VERSION, CARD_NAME, CARD_ELEMENT_NAME, CARD_FULL_NAME, CARD_EDITOR_NAME, DEFAULT_CONFIG, logger } from './const.js';
 import { HaRoomCardConfig, RoomCardData, ChangedProperties, CardAction, isNavigateAction, isMoreInfoAction, isCallServiceAction } from './types.js';
@@ -33,7 +33,6 @@ registerCustomCard({
 logger.log(`[HA Room Card] Registering custom card with type: custom:${CARD_NAME}`);
 logger.log(`[HA Room Card] CARD_NAME value: ${CARD_NAME}`);
 
-@customElement(CARD_ELEMENT_NAME)
 export class HaRoomCard extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
   @property({ attribute: false }) public config!: HaRoomCardConfig;

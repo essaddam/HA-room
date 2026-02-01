@@ -1,11 +1,10 @@
 import { LitElement, html, css, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { property, state } from 'lit/decorators.js';
 import { HomeAssistant, fireEvent, LovelaceCardEditor } from 'custom-card-helpers';
 import { HaRoomCardConfig } from './types.js';
 import { CARD_EDITOR_NAME } from './const.js';
 import { loadHaComponents, areComponentsLoaded } from './utils/loader.js';
 
-@customElement(CARD_EDITOR_NAME)
 export class HaRoomCardEditor extends LitElement implements LovelaceCardEditor {
   @property({ attribute: false }) public hass?: HomeAssistant;
   @state() private _config?: HaRoomCardConfig;
