@@ -98,3 +98,8 @@ tests/docker/homeassistant/home-assistant.log
 # Test artifacts
 test-results/
 playwright-report/
+
+# Home Assistant connection config (contains tokens)
+ha-config.json
+.ha-connection.json
+test-ha-*.js

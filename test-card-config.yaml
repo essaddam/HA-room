@@ -1,0 +1,38 @@
+# Configuration de test pour HA Room Card
+# À ajouter dans Configuration > Dashboards > Ressources
+# ou directement dans raw configuration editor
+
+title: Test HA Room Card
+views:
+  - title: Test Room Card
+    cards:
+      - type: custom:ha-room-card
+        name: Salon
+        icon: mdi:sofa
+        bg_start: '#667eea'
+        bg_end: '#764ba2'
+        temp_entity: sensor.freebox_temperature_2
+        hum_entity: sensor.temperature_couloire_humidity
+        light_list:
+          - light.door_opening_sensor_basic_2
+          - light.door_opening_sensor_basic
+          - light.smoke_sensor_basic
+        lights_hash: '#lights-salon'
+        plugs_hash: '#plugs-salon'
+        covers_hash: '#covers-salon'
+        presence_hash: '#presence-salon'
+        open_hash: '#open-salon'
+        audio_hash: '#audio-salon'
+        video_hash: '#video-salon'
+        cameras_hash: '#cameras-salon'
+
+      - type: custom:ha-room-card
+        name: Chambre
+        icon: mdi:bed
+        bg_start: '#f093fb'
+        bg_end: '#f5576c'
+        light_list:
+          - light.door_opening_sensor_basic_2
+        lights_hash: '#lights-chambre'
+        plugs_hash: '#plugs-chambre'
+        covers_hash: '#covers-chambre'
