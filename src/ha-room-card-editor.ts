@@ -452,14 +452,16 @@ export class HaRoomCardEditor extends LitElement implements LovelaceCardEditor {
   }
 }
 
-// Explicit element registration for the editor
-try {
-  if (!customElements.get(CARD_EDITOR_NAME)) {
-    customElements.define(CARD_EDITOR_NAME, HaRoomCardEditor);
-    console.info(`[HA Room Card] Editor "${CARD_EDITOR_NAME}" registered successfully`);
-  } else {
-    console.warn(`[HA Room Card] Editor "${CARD_EDITOR_NAME}" was already registered`);
+// Element registration - guard against double registration in scoped registry
+(function() {
+  const name = CARD_EDITOR_NAME;
+  if (customElements.get(name)) {
+    // Already registered in this scope, skip silently
+    return;
   }
-} catch (error) {
-  console.error(`[HA Room Card] Failed to register editor:`, error);
-}
+  try {
+    customElements.define(name, HaRoomCardEditor);
+  } catch (e) {
+    // Silently ignore registration errors in scoped registry contexts
+  }
+})();

@@ -785,17 +785,19 @@ export class HaRoomCard extends LitElement {
   }
 }
 
-// Explicit element registration with error handling
-try {
-  if (!customElements.get(CARD_ELEMENT_NAME)) {
-    customElements.define(CARD_ELEMENT_NAME, HaRoomCard);
-    console.info(`[HA Room Card] Element "${CARD_ELEMENT_NAME}" registered successfully`);
-  } else {
-    console.warn(`[HA Room Card] Element "${CARD_ELEMENT_NAME}" was already registered`);
+// Element registration - guard against double registration in scoped registry
+(function() {
+  const name = CARD_ELEMENT_NAME;
+  if (customElements.get(name)) {
+    // Already registered in this scope, skip silently
+    return;
   }
-} catch (error) {
-  console.error(`[HA Room Card] Failed to register element:`, error);
-}
+  try {
+    customElements.define(name, HaRoomCard);
+  } catch (e) {
+    // Silently ignore registration errors in scoped registry contexts
+  }
+})();
 
 // Pre-load HA components for the editor
 void loadHaComponents();
