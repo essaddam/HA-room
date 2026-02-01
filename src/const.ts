@@ -1,6 +1,7 @@
 export const CARD_VERSION = '1.47.3';
 
 export const CARD_NAME = 'ha-room-card';
+export const CARD_FULL_NAME = 'custom:ha-room-card';
 export const CARD_EDITOR_NAME = 'ha-room-card-editor';
 
 // Debug mode - enabled only in development
