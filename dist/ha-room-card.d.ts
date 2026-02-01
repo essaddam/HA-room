@@ -1,6 +1,7 @@
 import { LitElement, TemplateResult } from 'lit';
 import { HomeAssistant, LovelaceCardEditor } from 'custom-card-helpers';
 import { HaRoomCardConfig, ChangedProperties } from './types.js';
+import './ha-room-card-editor.js';
 export declare class HaRoomCard extends LitElement {
     hass: HomeAssistant;
     config: HaRoomCardConfig;
@@ -29,7 +30,7 @@ export declare class HaRoomCard extends LitElement {
     private _renderVideoButton;
     private _renderCamerasButton;
     protected render(): TemplateResult;
-    static getConfigElement(): Promise<LovelaceCardEditor>;
+    static getConfigElement(): LovelaceCardEditor;
     static getStubConfig(): {
         type: string;
         name: string;

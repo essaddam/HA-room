@@ -14,6 +14,7 @@ import {
   registerCustomCard,
 } from './utils.js';
 import { loadHaComponents } from './utils/loader.js';
+import './ha-room-card-editor.js';
 
 
 console.info(
@@ -748,8 +749,7 @@ export class HaRoomCard extends LitElement {
     `;
   }
 
-  public static async getConfigElement(): Promise<LovelaceCardEditor> {
-    await import('./ha-room-card-editor.js');
+  public static getConfigElement(): LovelaceCardEditor {
     return document.createElement(CARD_EDITOR_NAME) as LovelaceCardEditor;
   }
 
