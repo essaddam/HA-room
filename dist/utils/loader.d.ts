@@ -1,13 +1,10 @@
 /**
- * Load Home Assistant components using multiple strategies
+ * Load Home Assistant form components by triggering built-in card editors.
+ * This forces HA to lazy-load ha-form, ha-entity-picker, and all selectors.
  */
-export declare const loadHaComponents: () => Promise<boolean>;
+export declare const loadHaComponents: () => void;
 /**
- * Check if HA components are available
+ * Check if HA form components are available
  */
 export declare const areComponentsLoaded: () => boolean;
-/**
- * Force reload of components (for recovery)
- */
-export declare const reloadComponents: () => Promise<boolean>;
 //# sourceMappingURL=loader.d.ts.map

@@ -800,4 +800,4 @@ export class HaRoomCard extends LitElement {
 })();
 
 // Pre-load HA components for the editor
-void loadHaComponents();
+loadHaComponents();
