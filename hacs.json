@@ -3,7 +3,7 @@
   "render_readme": true,
   "filename": "ha-room-card.js",
   "card_type": "ha-room-card",
-  "version": "1.48.4",
+  "version": "1.49.1",
   "homeassistant": "2025.12.0",
   "country": [
     "FR"
