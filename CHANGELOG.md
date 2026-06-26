@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v1.50.1] - 2026-06-26
+## [v1.51.1] - 2026-06-26
 
 ### Changed
 - Visual refresh of the card: softer shadows, refined borders, glassmorphism backdrop, improved typography and button/chip styling.
@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated card editor and JSON schema with the new feature flags.
 - Bumped version to 1.47.14.
 
-## [v1.50.1] - 2026-06-26
+## [v1.51.1] - 2026-06-26
 
 ### Fixed
 - Fixed click propagation issue where tapping internal chips/buttons also triggered the card-level action (`tap_action`) and caused unwanted navigation.
@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated card editor and JSON schema to expose `card_tap_action`.
 - Bumped version to 1.47.13 to invalidate HACS/browser caches.
 
-## [v1.50.1] - 2024-12-07
+## [v1.51.1] - 2024-12-07
 
 ### Added
 - 🎉 Initial release of HA Room Card
