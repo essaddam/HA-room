@@ -1,4 +1,4 @@
-export const CARD_VERSION = '1.49.1';
+export const CARD_VERSION = '1.49.2';
 
 export const CARD_NAME = 'ha-room-card';
 // Use valid custom element name (no colon) for browser registration
