@@ -241,14 +241,19 @@
       "description": "Options expérimentales pour HA 2025.12+",
       "items": {
         "type": "string",
-        "enum": ["full_card_actions", "enhanced_animations", "adaptive_themes"]
+        "enum": ["full_card_actions", "enhanced_animations", "adaptive_themes", "hide_empty_sections", "hide_chips", "hide_lights_button", "hide_plugs_button", "hide_covers_button", "hide_audio_button", "hide_video_button", "hide_cameras_button"]
       },
       "default": []
     },
+    "card_tap_action": {
+      "$ref": "#/definitions/action",
+      "title": "Action au clic sur la carte",
+      "description": "Action lors du clic sur la carte (utiliser ce champ à la place de tap_action pour éviter les conflits avec les boutons internes)"
+    },
     "tap_action": {
       "$ref": "#/definitions/action",
-      "title": "Action au clic",
-      "description": "Action lors du clic sur la carte"
+      "title": "Action au clic (déprécié)",
+      "description": "Ancien nom. Préférez card_tap_action."
     },
     "hold_action": {
       "$ref": "#/definitions/action",

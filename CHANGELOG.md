@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.47.14] - 2026-06-26
+
+### Changed
+- Visual refresh of the card: softer shadows, refined borders, glassmorphism backdrop, improved typography and button/chip styling.
+- Sections (chips and buttons) can now be hidden automatically when they have no configured entities via the `hide_empty_sections` feature flag.
+- Added individual `hide_*` feature flags for chips and each button (lights, plugs, covers, audio, video, cameras).
+- Button grid now adapts its column count to the number of visible buttons.
+- Updated card editor and JSON schema with the new feature flags.
+- Bumped version to 1.47.14.
+
+## [v1.47.13] - 2026-06-26
+
+### Fixed
+- Fixed click propagation issue where tapping internal chips/buttons also triggered the card-level action (`tap_action`) and caused unwanted navigation.
+
+### Changed
+- Introduced `card_tap_action` as the preferred configuration key for card-level tap actions. The legacy `tap_action` key is still supported for backwards compatibility but logs a deprecation warning.
+- Card-level action is now handled through a background overlay so clicks on chips, buttons and other interactive children never leak to the card action.
+- Updated card editor and JSON schema to expose `card_tap_action`.
+- Bumped version to 1.47.13 to invalidate HACS/browser caches.
+
 ## [v1.47.12] - 2024-12-07
 
 ### Added

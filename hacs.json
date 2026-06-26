@@ -1,7 +1,7 @@
 {
   "name": "HA Room Card",
   "render_readme": true,
-  "filename": "dist/ha-room-card.js",
+  "filename": "ha-room-card.js",
   "card_type": "ha-room-card",
   "version": "1.47.12",
   "homeassistant": "2025.12.0",

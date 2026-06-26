@@ -1,7 +1,13 @@
 import { ActionConfig, LovelaceCard, NavigateActionConfig, MoreInfoActionConfig, CallServiceActionConfig } from 'custom-card-helpers';
 import type { PropertyValues } from 'lit';
 export type ChangedProperties = PropertyValues<unknown>;
-export type CardAction = NavigateActionConfig | MoreInfoActionConfig | CallServiceActionConfig | {
+export interface PerformActionConfig {
+    action: 'perform-action';
+    perform_action: string;
+    data?: Record<string, unknown>;
+    target?: Record<string, unknown>;
+}
+export type CardAction = NavigateActionConfig | MoreInfoActionConfig | CallServiceActionConfig | PerformActionConfig | {
     action: 'none';
 } | {
     action: string;
@@ -9,6 +15,7 @@ export type CardAction = NavigateActionConfig | MoreInfoActionConfig | CallServi
 export declare function isNavigateAction(action: CardAction): action is NavigateActionConfig;
 export declare function isMoreInfoAction(action: CardAction): action is MoreInfoActionConfig;
 export declare function isCallServiceAction(action: CardAction): action is CallServiceActionConfig;
+export declare function isPerformAction(action: CardAction): action is PerformActionConfig;
 export interface HaRoomCardConfig extends LovelaceCard {
     name?: string;
     icon?: string;
@@ -42,6 +49,9 @@ export interface HaRoomCardConfig extends LovelaceCard {
     occupancy?: OccupancyConfig;
     background?: BackgroundConfig;
     styles?: CustomStylesConfig;
+    /** Prefer `card_tap_action` - Home Assistant intercepts generic `tap_action` and can fire it for child clicks. */
+    card_tap_action?: ActionConfig;
+    /** @deprecated Use `card_tap_action` instead. Kept for backwards compatibility. */
     tap_action?: ActionConfig;
     hold_action?: ActionConfig;
     double_tap_action?: ActionConfig;

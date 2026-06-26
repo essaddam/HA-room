@@ -62,7 +62,7 @@ video_cover_entity: "media_player.tv_salon"
 covers_label: "Volets roulants"
 
 # Actions au clic sur la carte
-tap_action:
+card_tap_action:
   action: "navigate"
   navigation_path: "/lovelace/salon"
 

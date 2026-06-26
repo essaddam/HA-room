@@ -31,7 +31,7 @@ async function main() {
   console.log(`${YELLOW}📡 Vérification de l'accessibilité...${NC}`);
 
   try {
-    const response = await fetch(`${config.server}/hacsfiles/ha-room-card/ha-room-card.js`, {
+    const response = await fetch(`${config.server}/hacsfiles/HA-room/ha-room-card.js`, {
       method: 'HEAD',
       headers: {
         'Authorization': `Bearer ${config.token}`
@@ -48,6 +48,8 @@ async function main() {
       console.log('1. HACS > Frontend');
       console.log('2. Cherche "HA Room Card"');
       console.log('3. Clique sur "Download" si pas encore installé');
+      console.log('');
+      console.log(`${YELLOW}Note: le dossier HACS est "HA-room" (nom du repository GitHub).${NC}`);
     } else {
       console.log(`${RED}❌ Erreur HTTP ${response.status}${NC}`);
     }

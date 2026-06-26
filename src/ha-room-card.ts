@@ -1,8 +1,8 @@
 import { LitElement, html, css, TemplateResult, nothing } from 'lit';
 import { property, state } from 'lit/decorators.js';
-import { HomeAssistant, LovelaceCardEditor } from 'custom-card-helpers';
+import { HomeAssistant, LovelaceCardEditor, navigate } from 'custom-card-helpers';
 import { CARD_VERSION, CARD_NAME, CARD_ELEMENT_NAME, CARD_FULL_NAME, CARD_EDITOR_NAME, DEFAULT_CONFIG, logger } from './const.js';
-import { HaRoomCardConfig, RoomCardData, ChangedProperties, CardAction, isNavigateAction, isMoreInfoAction, isCallServiceAction } from './types.js';
+import { HaRoomCardConfig, RoomCardData, ChangedProperties, CardAction, isNavigateAction, isMoreInfoAction, isCallServiceAction, isPerformAction } from './types.js';
 import {
   computeEntityState,
   getNumericState,
@@ -56,11 +56,17 @@ export class HaRoomCard extends LitElement {
 
       ha-card {
         background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
-        border-radius: 20px;
+        border-radius: 16px;
         padding: 16px;
         position: relative;
         overflow: hidden;
-        transition: all 0.3s ease;
+        transition: box-shadow 0.2s ease;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      ha-card:hover {
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
       }
 
       .card-header {
@@ -72,22 +78,24 @@ export class HaRoomCard extends LitElement {
         display: flex;
         align-items: center;
         font-size: 20px;
-        font-weight: 650;
+        font-weight: 600;
+        letter-spacing: -0.01em;
         color: white;
         margin: 0;
         padding: 0;
       }
 
       .card-title ha-icon {
-        margin-right: 8px;
+        margin-right: 10px;
         font-size: 24px;
+        color: var(--icon-color, white);
       }
 
       .error {
         color: #ff6b6b;
         background: rgba(255, 107, 107, 0.1);
         border: 1px solid rgba(255, 107, 107, 0.3);
-        border-radius: 8px;
+        border-radius: 12px;
         padding: 12px;
         text-align: center;
         font-weight: 500;
@@ -96,129 +104,135 @@ export class HaRoomCard extends LitElement {
       .chips-container {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px;
-        margin-bottom: 16px;
+        gap: 6px;
+        margin-bottom: 12px;
       }
 
       .chip {
         display: inline-flex;
         align-items: center;
-        padding: 6px 12px;
-        border-radius: 16px;
-        font-size: 12px;
+        padding: 4px 8px;
+        border-radius: 999px;
+        font-size: 11px;
         font-weight: 500;
         cursor: pointer;
-        transition: all 0.2s ease;
-        background: rgba(255, 255, 255, 0.1);
+        transition: background 0.2s ease;
+        background: rgba(255, 255, 255, 0.14);
         color: white;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.12);
       }
 
       .chip:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.24);
       }
 
-      /* Home Assistant 2025.12 enhanced animations */
-      .chip {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      .control-button {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      /* Enhanced focus styles for accessibility */
       .chip:focus,
       .control-button:focus {
         outline: 2px solid var(--primary-color);
         outline-offset: 2px;
       }
 
-      /* Reduced motion support */
       @media (prefers-reduced-motion: reduce) {
         .chip,
-        .control-button {
+        .control-button,
+        ha-card {
           transition: none;
         }
       }
 
       .chip-icon {
-        margin-right: 6px;
-        font-size: 14px;
+        margin-right: 4px;
+        font-size: 12px;
       }
 
       .button-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-        margin-bottom: 16px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        margin-bottom: 10px;
       }
 
       .button-grid:last-child {
         margin-bottom: 0;
       }
 
+      .button-grid:empty {
+        display: none;
+      }
+
       .control-button {
-        background: rgba(255, 255, 255, 0.15);
+        background: rgba(255, 255, 255, 0.1);
         border-radius: 12px;
-        padding: 16px;
+        padding: 10px 6px;
         text-align: center;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: background 0.2s ease, transform 0.15s ease;
         border: 1px solid rgba(255, 255, 255, 0.1);
-        position: relative;
-        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 76px;
       }
 
       .control-button:hover {
-        background: rgba(255, 255, 255, 0.25);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        background: rgba(255, 255, 255, 0.18);
+        transform: translateY(-1px);
+      }
+
+      .control-button:active {
+        transform: translateY(0);
       }
 
       .control-button.primary {
-        background: rgba(255, 193, 7, 0.15);
-        border-color: rgba(255, 193, 7, 0.3);
+        background: rgba(255, 193, 7, 0.14);
+        border-color: rgba(255, 193, 7, 0.2);
       }
 
       .control-button.primary:hover {
-        background: rgba(255, 193, 7, 0.25);
+        background: rgba(255, 193, 7, 0.22);
       }
 
       .control-button.secondary {
-        background: rgba(156, 39, 176, 0.15);
-        border-color: rgba(156, 39, 176, 0.3);
+        background: rgba(156, 39, 176, 0.14);
+        border-color: rgba(156, 39, 176, 0.2);
       }
 
       .control-button.secondary:hover {
-        background: rgba(156, 39, 176, 0.25);
+        background: rgba(156, 39, 176, 0.22);
       }
 
       .control-button.tertiary {
-        background: rgba(0, 188, 212, 0.15);
-        border-color: rgba(0, 188, 212, 0.3);
+        background: rgba(0, 188, 212, 0.14);
+        border-color: rgba(0, 188, 212, 0.2);
       }
 
       .control-button.tertiary:hover {
-        background: rgba(0, 188, 212, 0.25);
+        background: rgba(0, 188, 212, 0.22);
       }
 
       .button-icon {
-        font-size: 24px;
-        margin-bottom: 8px;
+        font-size: 22px;
+        margin-bottom: 6px;
         display: block;
+        color: white;
       }
 
       .button-title {
-        font-size: 14px;
+        font-size: 11px;
         font-weight: 600;
         color: white;
-        margin-bottom: 4px;
+        margin-bottom: 2px;
+        letter-spacing: 0;
+        white-space: normal;
+        word-break: normal;
+        overflow-wrap: break-word;
+        line-height: 1.2;
       }
 
       .button-subtitle {
-        font-size: 12px;
+        font-size: 10px;
+        font-weight: 500;
         color: rgba(255, 255, 255, 0.8);
       }
 
@@ -227,7 +241,22 @@ export class HaRoomCard extends LitElement {
         height: 40px;
         border-radius: 8px;
         object-fit: cover;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
+      }
+
+      .card-action-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        cursor: pointer;
+        z-index: 0;
+      }
+
+      .card-content {
+        position: relative;
+        z-index: 1;
       }
 
       .full-card-overlay {
@@ -244,9 +273,13 @@ export class HaRoomCard extends LitElement {
         .button-grid {
           grid-template-columns: repeat(2, 1fr);
         }
-        
+
         ha-card {
-          padding: 12px;
+          padding: 14px;
+        }
+
+        .card-title {
+          font-size: 18px;
         }
       }
 
@@ -254,14 +287,18 @@ export class HaRoomCard extends LitElement {
         .button-grid {
           grid-template-columns: 1fr;
         }
-        
+
         .chips-container {
-          gap: 6px;
+          gap: 5px;
         }
-        
+
         .chip {
-          font-size: 11px;
-          padding: 4px 8px;
+          font-size: 10px;
+          padding: 3px 7px;
+        }
+
+        .button-title {
+          font-size: 12px;
         }
       }
     `;
@@ -280,6 +317,11 @@ export class HaRoomCard extends LitElement {
       ...config,
     };
     logger.log('[HA Room Card] Final config:', this.config);
+
+    // Warn users that the generic tap_action is handled by HA and may conflict with inner buttons.
+    if (this.config.tap_action && !this.config.card_tap_action) {
+      logger.warn('[HA Room Card] Using deprecated "tap_action". Prefer "card_tap_action" to avoid conflicts with chips/buttons.');
+    }
 
     // Trigger a re-render after config is set
     this.requestUpdate();
@@ -373,11 +415,11 @@ export class HaRoomCard extends LitElement {
     this.roomData = data;
   }
 
-  private _isValidNavigationPath(path: string): boolean {
+  public static isValidNavigationPath(path: string): boolean {
     // Allow hash-based navigation (most common in HA), absolute paths, or external URLs
     return /^#[a-zA-Z0-9_-]+$/.test(path) ||
            /^\/[a-zA-Z0-9_/-]+$/.test(path) ||
-           /^https:\/\/[a-zA-Z0-9][-a-zA-Z0-9]*\.[-a-zA-Z0-9.]+/.test(path);
+           /^https?:\/\/[a-zA-Z0-9][-a-zA-Z0-9.]*(?::\d+)?/.test(path);
   }
 
   private _executeAction(action: CardAction | undefined, context: string): void {
@@ -390,13 +432,13 @@ export class HaRoomCard extends LitElement {
 
     // Handle navigation
     if (isNavigateAction(action)) {
-      if (!this._isValidNavigationPath(action.navigation_path)) {
+      if (!HaRoomCard.isValidNavigationPath(action.navigation_path)) {
         logger.error(`[HA Room Card] Invalid navigation path:`, action.navigation_path);
         return;
       }
       logger.log(`[HA Room Card] ${context} navigating to:`, action.navigation_path);
       try {
-        window.location.href = action.navigation_path;
+        navigate(this, action.navigation_path);
       } catch (error) {
         logger.error(`[HA Room Card] ${context} navigation error:`, error);
       }
@@ -419,7 +461,7 @@ export class HaRoomCard extends LitElement {
       return;
     }
 
-    // Handle service calls
+    // Handle service calls (legacy call-service)
     if (isCallServiceAction(action)) {
       logger.log(`[HA Room Card] ${context} calling service:`, action.service, 'with data:', action.service_data);
       try {
@@ -436,23 +478,51 @@ export class HaRoomCard extends LitElement {
       } catch (error) {
         logger.error(`[HA Room Card] ${context} service call error:`, error);
       }
-    } else {
-      logger.warn(`[HA Room Card] ${context} unknown action type or missing service:`, action);
+      return;
     }
+
+    // Handle perform-action (Home Assistant 2025.12+)
+    if (isPerformAction(action)) {
+      logger.log(`[HA Room Card] ${context} performing action:`, action.perform_action, 'with data:', action.data);
+      try {
+        const [domain, service] = action.perform_action.split('.');
+        logger.log(`[HA Room Card] ${context} parsed perform action:`, { domain, service });
+
+        if (!domain || !service) {
+          logger.error(`[HA Room Card] ${context} invalid perform_action format:`, action.perform_action);
+          return;
+        }
+
+        this.hass.callService(domain, service, action.data || {}, action.target);
+        logger.log(`[HA Room Card] ${context} perform action initiated successfully`);
+      } catch (error) {
+        logger.error(`[HA Room Card] ${context} perform action error:`, error);
+      }
+      return;
+    }
+
+    logger.warn(`[HA Room Card] ${context} unknown action type or missing service:`, action);
+  }
+
+  private _getCardAction(): CardAction | undefined {
+    return this.config.card_tap_action ?? this.config.tap_action;
   }
 
   private _handleCardAction(): void {
     logger.log('[HA Room Card] Handling card action...');
 
-    if (!this.config.tap_action || !this.hass) {
-      logger.error('[HA Room Card] Missing tap_action or hass:', {
+    const action = this._getCardAction();
+
+    if (!action || !this.hass) {
+      logger.error('[HA Room Card] Missing card action or hass:', {
+        card_tap_action: !!this.config.card_tap_action,
         tap_action: !!this.config.tap_action,
         hass: !!this.hass
       });
       return;
     }
 
-    this._executeAction(this.config.tap_action, 'card');
+    this._executeAction(action, 'card');
   }
 
   private _renderChip(icon: string, color: string, content: string, action?: CardAction, entity?: string): TemplateResult {
@@ -460,7 +530,12 @@ export class HaRoomCard extends LitElement {
       <div 
         class="chip" 
         style="--chip-color: ${color}"
-        @click=${() => this._handleChipAction(action, entity)}
+        @click=${(ev: Event) => {
+          ev.stopImmediatePropagation();
+          ev.stopPropagation();
+          ev.preventDefault();
+          this._handleChipAction(action, entity);
+        }}
       >
         <ha-icon class="chip-icon" icon=${icon}></ha-icon>
         ${content}
@@ -561,7 +636,12 @@ export class HaRoomCard extends LitElement {
     return html`
       <div 
         class="control-button ${type}"
-        @click=${() => this._handleButtonAction(action)}
+        @click=${(ev: Event) => {
+          ev.stopImmediatePropagation();
+          ev.stopPropagation();
+          ev.preventDefault();
+          this._handleButtonAction(action);
+        }}
       >
         ${coverImage
         ? html`<img class="media-cover" src="${coverImage}" alt="${title}">`
@@ -607,7 +687,7 @@ export class HaRoomCard extends LitElement {
   private _renderCoversButton(): TemplateResult {
     return this._renderControlButton(
       this.config.covers_label || 'Volets',
-      'Ouvrir / Fermer',
+      'Contrôler',
       'mdi:blinds',
       { action: 'navigate', navigation_path: this.config.covers_hash },
       'tertiary'
@@ -674,6 +754,58 @@ export class HaRoomCard extends LitElement {
     );
   }
 
+  private _hasFeature(feature: string): boolean {
+    return this.config.features?.includes(feature) ?? false;
+  }
+
+  private _shouldHideEmptySections(): boolean {
+    return this._hasFeature('hide_empty_sections');
+  }
+
+  private _hasVisibleChips(): boolean {
+    if (this._hasFeature('hide_chips')) return false;
+    return !!(
+      this.config.temp_entity ||
+      this.config.hum_entity ||
+      this.config.power_list?.length ||
+      this.config.presence_list?.length ||
+      this.config.open_list?.length ||
+      this.config.extra_chips?.length
+    );
+  }
+
+  private _shouldRenderLightsButton(): boolean {
+    if (this._hasFeature('hide_lights_button')) return false;
+    if (!this._shouldHideEmptySections()) return true;
+    return !!this.config.light_list?.length;
+  }
+
+  private _shouldRenderPlugsButton(): boolean {
+    if (this._hasFeature('hide_plugs_button')) return false;
+    if (!this._shouldHideEmptySections()) return true;
+    return !!this.config.power_list?.length;
+  }
+
+  private _shouldRenderCoversButton(): boolean {
+    return !this._hasFeature('hide_covers_button');
+  }
+
+  private _shouldRenderAudioButton(): boolean {
+    if (this._hasFeature('hide_audio_button')) return false;
+    if (!this._shouldHideEmptySections()) return true;
+    return !!this.config.audio_cover_entity;
+  }
+
+  private _shouldRenderVideoButton(): boolean {
+    if (this._hasFeature('hide_video_button')) return false;
+    if (!this._shouldHideEmptySections()) return true;
+    return !!this.config.video_cover_entity;
+  }
+
+  private _shouldRenderCamerasButton(): boolean {
+    return !this._hasFeature('hide_cameras_button');
+  }
+
   protected render(): TemplateResult {
     logger.log('[HA Room Card] Render called - config:', !!this.config, 'hass:', !!this.hass);
 
@@ -693,56 +825,72 @@ export class HaRoomCard extends LitElement {
     const primaryColor = currentTheme?.['primary-color'] ?? '#03a9f4';
     const textColor = currentTheme?.['text-primary-color'] ?? '#ffffff';
 
+    const hasCardAction = !!(this.config.card_tap_action || this.config.tap_action);
+    const firstRowCount = [this._shouldRenderLightsButton(), this._shouldRenderPlugsButton(), this._shouldRenderCoversButton()].filter(Boolean).length;
+    const secondRowCount = [this._shouldRenderAudioButton(), this._shouldRenderVideoButton(), this._shouldRenderCamerasButton()].filter(Boolean).length;
+
     return html`
       <ha-card
-        style="--bg-start: ${this.config.bg_start}; --bg-end: ${this.config.bg_end}; --primary-color: ${primaryColor}; --text-color: ${textColor}"
-        @click=${this._handleCardAction}
+        style="--bg-start: ${this.config.bg_start}; --bg-end: ${this.config.bg_end}; --primary-color: ${primaryColor}; --text-color: ${textColor}; --icon-color: ${this.config.icon_color || 'white'}"
         tabindex="0"
         .label=${`HA Room Card: ${this.config.name || 'Room'}`}
         role="button"
         aria-label=${`Room card for ${this.config.name || 'Room'}`}
       >
-        <!-- Full card overlay for actions -->
+        <!-- Click overlay that covers the whole card background.
+             Content is stacked above it (z-index:1) so chips/buttons never hit it. -->
+        ${hasCardAction
+          ? html`<div class="card-action-overlay" @click=${(ev: Event) => { ev.stopPropagation(); this._handleCardAction(); }}></div>`
+          : nothing}
+
+        <!-- Legacy full-card overlay kept for users that explicitly opt-in -->
         ${this.config.features?.includes('full_card_actions')
-        ? html`<div class="full-card-overlay" @click=${() => this._handleCardAction()}></div>`
-        : nothing
-      }
+          ? html`<div class="full-card-overlay" @click=${(ev: Event) => { ev.stopPropagation(); this._handleCardAction(); }}></div>`
+          : nothing}
 
-        <!-- Header -->
-        <div class="card-header">
-          <h1 class="card-title">
-            <ha-icon icon=${this.config.icon || 'mdi:home'}></ha-icon>
-            ${this.config.name || 'Pièce'}
-          </h1>
-        </div>
+        <div class="card-content">
+          <!-- Header -->
+          <div class="card-header">
+            <h1 class="card-title">
+              <ha-icon icon=${this.config.icon || 'mdi:home'}></ha-icon>
+              ${this.config.name || 'Pièce'}
+            </h1>
+          </div>
 
-        <!-- Chips Row -->
-        <div class="chips-container">
-          ${this._renderTemperatureChip()}
-          ${this._renderHumidityChip()}
-          ${this.config.extra_chips?.map(chip => {
-        const sanitizedContent = chip.content?.replace(/[<>"']/g, '') ?? '';
-        const sanitizedIcon = chip.icon?.replace(/[<>"']/g, '') ?? 'mdi:help-circle';
-        const sanitizedColor = chip.icon_color?.replace(/[<>"']/g, '') ?? 'white';
-        return this._renderChip(sanitizedIcon, sanitizedColor, sanitizedContent, chip.tap_action);
-      })}
-          ${this._renderPowerChip()}
-          ${this._renderPresenceChip()}
-          ${this._renderOpenChip()}
-        </div>
+          <!-- Chips Row -->
+          ${this._hasVisibleChips()
+            ? html`<div class="chips-container">
+                ${this._renderTemperatureChip()}
+                ${this._renderHumidityChip()}
+                ${this.config.extra_chips?.map(chip => {
+                  const sanitizedContent = chip.content?.replace(/[<>"']/g, '') ?? '';
+                  const sanitizedIcon = chip.icon?.replace(/[<>"']/g, '') ?? 'mdi:help-circle';
+                  const sanitizedColor = chip.icon_color?.replace(/[<>"']/g, '') ?? 'white';
+                  return this._renderChip(sanitizedIcon, sanitizedColor, sanitizedContent, chip.tap_action);
+                })}
+                ${this._renderPowerChip()}
+                ${this._renderPresenceChip()}
+                ${this._renderOpenChip()}
+              </div>`
+            : nothing}
 
-        <!-- First Button Row: Lights / Plugs / Covers -->
-        <div class="button-grid">
-          ${this._renderLightsButton()}
-          ${this._renderPlugsButton()}
-          ${this._renderCoversButton()}
-        </div>
+          <!-- First Button Row: Lights / Plugs / Covers -->
+          ${firstRowCount > 0
+            ? html`<div class="button-grid" style="grid-template-columns: repeat(${firstRowCount}, minmax(0, 1fr));">
+                ${this._shouldRenderLightsButton() ? this._renderLightsButton() : nothing}
+                ${this._shouldRenderPlugsButton() ? this._renderPlugsButton() : nothing}
+                ${this._shouldRenderCoversButton() ? this._renderCoversButton() : nothing}
+              </div>`
+            : nothing}
 
-        <!-- Second Button Row: Audio / Video / Cameras -->
-        <div class="button-grid">
-          ${this._renderAudioButton()}
-          ${this._renderVideoButton()}
-          ${this._renderCamerasButton()}
+          <!-- Second Button Row: Audio / Video / Cameras -->
+          ${secondRowCount > 0
+            ? html`<div class="button-grid" style="grid-template-columns: repeat(${secondRowCount}, minmax(0, 1fr));">
+                ${this._shouldRenderAudioButton() ? this._renderAudioButton() : nothing}
+                ${this._shouldRenderVideoButton() ? this._renderVideoButton() : nothing}
+                ${this._shouldRenderCamerasButton() ? this._renderCamerasButton() : nothing}
+              </div>`
+            : nothing}
         </div>
       </ha-card>
     `;

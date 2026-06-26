@@ -11,8 +11,9 @@ export declare class HaRoomCard extends LitElement {
     setConfig(config: HaRoomCardConfig): void;
     protected willUpdate(changedProperties: ChangedProperties): void;
     private _updateRoomData;
-    private _isValidNavigationPath;
+    static isValidNavigationPath(path: string): boolean;
     private _executeAction;
+    private _getCardAction;
     private _handleCardAction;
     private _renderChip;
     private _handleChipAction;
@@ -29,6 +30,15 @@ export declare class HaRoomCard extends LitElement {
     private _renderAudioButton;
     private _renderVideoButton;
     private _renderCamerasButton;
+    private _hasFeature;
+    private _shouldHideEmptySections;
+    private _hasVisibleChips;
+    private _shouldRenderLightsButton;
+    private _shouldRenderPlugsButton;
+    private _shouldRenderCoversButton;
+    private _shouldRenderAudioButton;
+    private _shouldRenderVideoButton;
+    private _shouldRenderCamerasButton;
     protected render(): TemplateResult;
     static getConfigElement(): LovelaceCardEditor;
     static getStubConfig(): {

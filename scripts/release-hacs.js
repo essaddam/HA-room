@@ -121,7 +121,7 @@ async function createGitHubRelease(version) {
 
     // Créer la release
     execSync(
-      `gh release create "v${version}" dist/ha-room-card.js hacs.json --title "v${version}" --notes "Release v${version}"`,
+      `gh release create "v${version}" dist/ha-room-card.js --title "v${version}" --notes "Release v${version}"`,
       { stdio: 'inherit' }
     );
 

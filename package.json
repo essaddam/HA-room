@@ -1,6 +1,6 @@
 {
   "name": "ha-room-card",
-  "version": "1.47.12",
+  "version": "1.47.14",
   "description": "Custom room card for Home Assistant with modern design and interactive features",
   "type": "module",
   "main": "dist/ha-room-card.js",
@@ -52,6 +52,8 @@
     "@typescript-eslint/eslint-plugin": "^6.7.4",
     "@typescript-eslint/parser": "^6.7.4",
     "eslint": "^8.50.0",
+    "happy-dom": "^20.10.6",
+    "jsdom": "^29.1.1",
     "puppeteer": "^24.32.1",
     "rollup": "^4.1.4",
     "typescript": "^5.2.2",

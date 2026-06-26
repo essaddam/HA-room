@@ -137,10 +137,12 @@ video_cover_entity: "media_player.tv_salon"
 covers_label: "Volets"
 
 # Actions
-tap_action:
+card_tap_action:
   action: "navigate"
   navigation_path: "/lovelace/salon"
 ```
+
+> **Note :** Utilisez `card_tap_action` pour l'action au clic sur la carte entière. L'ancienne clé `tap_action` reste fonctionnelle mais est dépréciée car Home Assistant peut l'intercepter et la déclencher en même temps que les boutons internes (Lumières, Prises, etc.).
 
 ## Personnalisation avancée
 
@@ -153,6 +155,24 @@ icon: "mdi:bed"
 icon_color: "purple"
 bg_start: "#4a148c"
 bg_end: "#6b46c1"
+```
+
+### Masquer les sections inutilisées
+
+Ajoutez `hide_empty_sections` dans `features` pour masquer automatiquement les chips et les boutons qui n'ont pas d'entités configurées. Vous pouvez aussi masquer des éléments individuellement.
+
+```yaml
+type: custom:ha-room-card
+name: "Salon"
+features:
+  - hide_empty_sections
+  # - hide_chips
+  # - hide_lights_button
+  # - hide_plugs_button
+  # - hide_covers_button
+  # - hide_audio_button
+  # - hide_video_button
+  # - hide_cameras_button
 ```
 
 ### Chips supplémentaires
