@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.50.2] - 2026-06-26
+
+### Added
+- 🆕 New interactive popups for **Covers**, **Audio/Video** and **Cameras**.
+- All control buttons (Lights, Plugs, Covers, Audio, Video, Cameras) now open a native-style popup instead of navigating via hashes.
+- `cover_list` and `camera_list` configuration options to explicitly select which covers/cameras appear in their popups.
+
+### Fixed
+- Popups now update in real-time when toggling entities (state changes are propagated to every open popup).
+- Removed unused `_renderControlButton` helper and cleaned up popup TypeScript imports.
+
 ## [v1.50.1] - 2026-06-26
 
 ### Changed
