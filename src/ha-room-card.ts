@@ -15,6 +15,7 @@ import {
 } from './utils.js';
 import { loadHaComponents } from './utils/loader.js';
 import './ha-room-card-editor.js';
+import './components/lights-popup.js';
 
 
 console.info(
@@ -662,13 +663,34 @@ export class HaRoomCard extends LitElement {
     const totalCount = this.roomData.light_count || 0;
     const subtitle = `${onCount} / ${totalCount}`;
 
-    return this._renderControlButton(
-      'Lumières',
-      subtitle,
-      'mdi:lightbulb-group',
-      { action: 'navigate', navigation_path: this.config.lights_hash },
-      'primary'
-    );
+    return html`
+      <div
+        class="control-button primary"
+        @click=${(ev: Event) => {
+          ev.stopImmediatePropagation();
+          ev.stopPropagation();
+          ev.preventDefault();
+          this._openLightsPopup();
+        }}
+      >
+        <ha-icon class="button-icon" icon="mdi:lightbulb-group"></ha-icon>
+        <div class="button-title">Lumières</div>
+        <div class="button-subtitle">${subtitle}</div>
+      </div>
+    `;
+  }
+
+  private _openLightsPopup(): void {
+    if (!this.hass || !this.config.light_list?.length) {
+      logger.warn('[HA Room Card] Cannot open lights popup: missing hass or light_list');
+      return;
+    }
+
+    const popup = document.createElement('lights-popup') as any;
+    popup.hass = this.hass;
+    popup.lights = this.config.light_list;
+    popup.config = { title: 'Lumières', icon: 'mdi:lightbulb-group' };
+    popup.open();
   }
 
   private _renderPlugsButton(): TemplateResult {
