@@ -6,4 +6,9 @@ export declare class PresencePopup extends PopupBase {
     protected renderBody(): TemplateResult;
     private _renderPresenceSensor;
 }
+declare global {
+    interface HTMLElementTagNameMap {
+        'presence-popup': PresencePopup;
+    }
+}
 //# sourceMappingURL=presence-popup.d.ts.map

@@ -6,4 +6,9 @@ export declare class OpeningsPopup extends PopupBase {
     protected renderBody(): TemplateResult;
     private _renderOpening;
 }
+declare global {
+    interface HTMLElementTagNameMap {
+        'openings-popup': OpeningsPopup;
+    }
+}
 //# sourceMappingURL=openings-popup.d.ts.map

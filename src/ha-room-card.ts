@@ -16,6 +16,9 @@ import {
 import { loadHaComponents } from './utils/loader.js';
 import './ha-room-card-editor.js';
 import { LightsPopup } from './components/lights-popup.js';
+import { PlugsPopup } from './components/plugs-popup.js';
+import { PresencePopup } from './components/presence-popup.js';
+import { OpeningsPopup } from './components/openings-popup.js';
 
 
 console.info(
@@ -604,12 +607,21 @@ export class HaRoomCard extends LitElement {
     const count = this.roomData.presence_count || 0;
     const content = `${count} présence${count > 1 ? 's' : ''}`;
 
-    return this._renderChip(
-      'mdi:motion-sensor',
-      'teal',
-      content,
-      { action: 'navigate', navigation_path: this.config.presence_hash }
-    );
+    return html`
+      <div
+        class="chip"
+        style="--chip-color: teal"
+        @click=${(ev: Event) => {
+          ev.stopImmediatePropagation();
+          ev.stopPropagation();
+          ev.preventDefault();
+          this._openPresencePopup();
+        }}
+      >
+        <ha-icon class="chip-icon" icon="mdi:motion-sensor"></ha-icon>
+        ${content}
+      </div>
+    `;
   }
 
   private _renderOpenChip(): TemplateResult | typeof nothing {
@@ -618,12 +630,41 @@ export class HaRoomCard extends LitElement {
     const count = this.roomData.open_count || 0;
     const content = `${count} ouvert${count > 1 ? 's' : ''}`;
 
-    return this._renderChip(
-      'mdi:door-open',
-      'red',
-      content,
-      { action: 'navigate', navigation_path: this.config.open_hash }
-    );
+    return html`
+      <div
+        class="chip"
+        style="--chip-color: red"
+        @click=${(ev: Event) => {
+          ev.stopImmediatePropagation();
+          ev.stopPropagation();
+          ev.preventDefault();
+          this._openOpeningsPopup();
+        }}
+      >
+        <ha-icon class="chip-icon" icon="mdi:door-open"></ha-icon>
+        ${content}
+      </div>
+    `;
+  }
+
+  private _openPresencePopup(): void {
+    if (!this.hass || !this.config.presence_list?.length) return;
+
+    const popup = new PresencePopup();
+    popup.hass = this.hass;
+    popup.entities = this.config.presence_list;
+    popup.config = { title: 'Présence', icon: 'mdi:motion-sensor' };
+    popup.open();
+  }
+
+  private _openOpeningsPopup(): void {
+    if (!this.hass || !this.config.open_list?.length) return;
+
+    const popup = new OpeningsPopup();
+    popup.hass = this.hass;
+    popup.entities = this.config.open_list;
+    popup.config = { title: 'Ouvrants', icon: 'mdi:door-open' };
+    popup.open();
   }
 
   private _renderControlButton(
@@ -697,13 +738,35 @@ export class HaRoomCard extends LitElement {
     const power = this.roomData.power_total || 0;
     const subtitle = formatPower(power);
 
-    return this._renderControlButton(
-      'Prises',
-      subtitle,
-      'mdi:power-socket-fr',
-      { action: 'navigate', navigation_path: this.config.plugs_hash },
-      'secondary'
-    );
+    return html`
+      <div
+        class="control-button secondary"
+        @click=${(ev: Event) => {
+          ev.stopImmediatePropagation();
+          ev.stopPropagation();
+          ev.preventDefault();
+          this._openPlugsPopup();
+        }}
+      >
+        <ha-icon class="button-icon" icon="mdi:power-socket-fr"></ha-icon>
+        <div class="button-title">Prises</div>
+        <div class="button-subtitle">${subtitle}</div>
+      </div>
+    `;
+  }
+
+  private _openPlugsPopup(): void {
+    if (!this.hass) {
+      logger.warn('[HA Room Card] Cannot open plugs popup: missing hass');
+      return;
+    }
+
+    const popup = new PlugsPopup();
+    popup.hass = this.hass;
+    popup.entities = this.config.power_list || [];
+    popup.power_list = this.config.power_list || [];
+    popup.config = { title: 'Prises', icon: 'mdi:power-socket-fr' };
+    popup.open();
   }
 
   private _renderCoversButton(): TemplateResult {

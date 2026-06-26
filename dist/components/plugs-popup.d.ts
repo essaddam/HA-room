@@ -8,4 +8,9 @@ export declare class PlugsPopup extends PopupBase {
     private _renderEntity;
     private _toggleEntity;
 }
+declare global {
+    interface HTMLElementTagNameMap {
+        'plugs-popup': PlugsPopup;
+    }
+}
 //# sourceMappingURL=plugs-popup.d.ts.map

@@ -22,11 +22,14 @@ export declare class HaRoomCard extends LitElement {
     private _renderPowerChip;
     private _renderPresenceChip;
     private _renderOpenChip;
+    private _openPresencePopup;
+    private _openOpeningsPopup;
     private _renderControlButton;
     private _handleButtonAction;
     private _renderLightsButton;
     private _openLightsPopup;
     private _renderPlugsButton;
+    private _openPlugsPopup;
     private _renderCoversButton;
     private _renderAudioButton;
     private _renderVideoButton;

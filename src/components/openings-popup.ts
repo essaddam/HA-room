@@ -1,104 +1,32 @@
 import { html, css, TemplateResult } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { property } from 'lit/decorators.js';
 import { PopupBase } from './popup-base.js';
 import { isEntityOn, getFriendlyName, getIcon } from '../utils.js';
 
-@customElement('openings-popup')
 export class OpeningsPopup extends PopupBase {
   @property({ attribute: false }) public entities!: string[];
 
   static get styles() {
     return css`
-      .openings-grid {
+      ${super.styles}
+
+      .openings-summary {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 16px;
-      }
-
-      .opening-item {
-        background: var(--card-background-color, white);
-        border: 2px solid var(--divider-color);
-        border-radius: 12px;
-        padding: 16px;
-        text-align: center;
-        transition: all 0.2s ease;
-        position: relative;
-      }
-
-      .opening-item.open {
-        background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
-        color: white;
-        border-color: #f44336;
-        animation: alertPulse 2s infinite;
-      }
-
-      .opening-item:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      }
-
-      .opening-icon {
-        font-size: 40px;
-        margin-bottom: 12px;
-        display: block;
-      }
-
-      .opening-item.open .opening-icon {
-        color: white;
-      }
-
-      .opening-name {
-        font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 8px;
-      }
-
-      .opening-status {
-        font-size: 12px;
-        opacity: 0.8;
-      }
-
-      .opening-time {
-        font-size: 11px;
-        opacity: 0.6;
-        margin-top: 8px;
-      }
-
-      .alert-badge {
-        position: absolute;
-        top: -8px;
-        right: -8px;
-        background: #f44336;
-        color: white;
-        border-radius: 50%;
-        width: 24px;
-        height: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        font-weight: 700;
-        animation: alertPulse 2s infinite;
-      }
-
-      .summary-stats {
-        display: flex;
-        justify-content: space-around;
-        margin-bottom: 20px;
-        gap: 16px;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 16px;
       }
 
       .stat-item {
         text-align: center;
-        flex: 1;
         padding: 16px;
-        background: var(--card-background-color, white);
-        border-radius: 12px;
-        border: 1px solid var(--divider-color);
+        border-radius: 16px;
+        background: var(--secondary-background-color, rgba(0,0,0,0.04));
+        border: 1px solid var(--divider-color, rgba(0,0,0,0.06));
       }
 
       .stat-value {
-        font-size: 24px;
+        font-size: 26px;
         font-weight: 700;
         margin-bottom: 4px;
       }
@@ -113,33 +41,95 @@ export class OpeningsPopup extends PopupBase {
 
       .stat-label {
         font-size: 12px;
-        opacity: 0.8;
+        color: var(--secondary-text-color, #757575);
       }
 
-      @keyframes alertPulse {
-        0% { 
-          transform: scale(1);
-          opacity: 1;
-        }
-        50% { 
-          transform: scale(1.1);
-          opacity: 0.8;
-        }
-        100% { 
-          transform: scale(1);
-          opacity: 1;
-        }
+      .openings-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 12px;
       }
 
-      @media (max-width: 768px) {
+      .opening-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding: 18px 12px;
+        border-radius: 16px;
+        background: var(--secondary-background-color, rgba(0,0,0,0.04));
+        border: 1px solid var(--divider-color, rgba(0,0,0,0.06));
+        text-align: center;
+        position: relative;
+        transition: background 0.15s ease;
+      }
+
+      .opening-item.open {
+        background: rgba(244, 67, 54, 0.1);
+        border-color: rgba(244, 67, 54, 0.25);
+      }
+
+      .opening-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: var(--card-background-color, #ffffff);
+        color: var(--secondary-text-color, #757575);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      }
+
+      .opening-item.open .opening-icon {
+        background: #f44336;
+        color: white;
+      }
+
+      .opening-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--primary-text-color, #212121);
+      }
+
+      .opening-status {
+        font-size: 12px;
+        color: var(--secondary-text-color, #757575);
+      }
+
+      .opening-time {
+        font-size: 11px;
+        color: var(--secondary-text-color, #757575);
+        margin-top: 2px;
+      }
+
+      .alert-badge {
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #f44336;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 32px 16px;
+        color: var(--secondary-text-color, #757575);
+        font-size: 14px;
+      }
+
+      @media (max-width: 600px) {
         .openings-grid {
-          grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 12px;
-          }
-          
-        .summary-stats {
-          flex-direction: column;
-          gap: 12px;
+          grid-template-columns: repeat(2, 1fr);
         }
       }
     `;
@@ -147,17 +137,16 @@ export class OpeningsPopup extends PopupBase {
 
   protected renderBody(): TemplateResult {
     if (!this.entities?.length) {
-      return html`<p>Aucune ouverture configurée</p>`;
+      return html`<div class="empty-state">Aucun ouvrant configuré</div>`;
     }
 
-    const openCount = this.entities.filter(entityId => 
+    const openCount = this.entities.filter(entityId =>
       isEntityOn(this.hass, entityId)
     ).length;
     const closedCount = this.entities.length - openCount;
 
     return html`
-      <!-- Summary Stats -->
-      <div class="summary-stats">
+      <div class="openings-summary">
         <div class="stat-item">
           <div class="stat-value open">${openCount}</div>
           <div class="stat-label">Ouvert${openCount > 1 ? 's' : ''}</div>
@@ -168,7 +157,6 @@ export class OpeningsPopup extends PopupBase {
         </div>
       </div>
 
-      <!-- Openings Grid -->
       <div class="openings-grid">
         ${this.entities.map(entityId => this._renderOpening(entityId))}
       </div>
@@ -187,17 +175,29 @@ export class OpeningsPopup extends PopupBase {
     return html`
       <div class="opening-item ${isOpen ? 'open' : ''}">
         ${isOpen ? html`<div class="alert-badge">!</div>` : html``}
-        <ha-icon class="opening-icon" icon=${icon}></ha-icon>
+        <div class="opening-icon">
+          <ha-icon icon=${icon}></ha-icon>
+        </div>
         <div class="opening-name">${friendlyName}</div>
         <div class="opening-status">
           ${isOpen ? 'Ouvert' : 'Fermé'}
         </div>
         ${lastChanged ? html`
           <div class="opening-time">
-            Dernier changement: ${new Date(lastChanged).toLocaleTimeString()}
+            ${new Date(lastChanged).toLocaleTimeString()}
           </div>
         ` : html``}
       </div>
     `;
+  }
+}
+
+if (!customElements.get('openings-popup')) {
+  customElements.define('openings-popup', OpeningsPopup);
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'openings-popup': OpeningsPopup;
   }
 }

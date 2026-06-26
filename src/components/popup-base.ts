@@ -21,10 +21,8 @@ export class PopupBase extends LitElement {
         align-items: center;
         justify-content: center;
         padding: 16px;
-        background: rgba(0, 0, 0, 0.55);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        animation: fadeIn 0.2s ease;
+        background: rgba(0, 0, 0, 0.65);
+        animation: fadeIn 0.15s ease;
       }
 
       .popup-backdrop {
@@ -42,7 +40,7 @@ export class PopupBase extends LitElement {
         max-height: calc(100vh - 32px);
         overflow: hidden;
         box-shadow: 0 24px 48px rgba(0, 0, 0, 0.28);
-        animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        animation: slideUp 0.18s cubic-bezier(0.16, 1, 0.3, 1);
         display: flex;
         flex-direction: column;
       }
@@ -123,7 +121,7 @@ export class PopupBase extends LitElement {
           max-width: 100%;
           max-height: 90vh;
           border-radius: 20px 20px 0 0;
-          animation: slideUpMobile 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+          animation: slideUpMobile 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
       }
 
