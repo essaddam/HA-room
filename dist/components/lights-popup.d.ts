@@ -8,4 +8,9 @@ export declare class LightsPopup extends PopupBase {
     private _toggleLight;
     private _setBrightness;
 }
+declare global {
+    interface HTMLElementTagNameMap {
+        'lights-popup': LightsPopup;
+    }
+}
 //# sourceMappingURL=lights-popup.d.ts.map

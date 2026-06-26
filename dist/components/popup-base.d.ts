@@ -1,6 +1,6 @@
 import { LitElement, TemplateResult } from 'lit';
 import { HomeAssistant } from 'custom-card-helpers';
-interface PopupConfig {
+export interface PopupConfig {
     icon?: string;
     title?: string;
 }
@@ -14,5 +14,9 @@ export declare class PopupBase extends LitElement {
     open(): void;
     close(): void;
 }
-export {};
+declare global {
+    interface HTMLElementTagNameMap {
+        'popup-base': PopupBase;
+    }
+}
 //# sourceMappingURL=popup-base.d.ts.map

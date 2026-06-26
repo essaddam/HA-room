@@ -15,7 +15,7 @@ import {
 } from './utils.js';
 import { loadHaComponents } from './utils/loader.js';
 import './ha-room-card-editor.js';
-import './components/lights-popup.js';
+import { LightsPopup } from './components/lights-popup.js';
 
 
 console.info(
@@ -686,7 +686,7 @@ export class HaRoomCard extends LitElement {
       return;
     }
 
-    const popup = document.createElement('lights-popup') as any;
+    const popup = new LightsPopup();
     popup.hass = this.hass;
     popup.lights = this.config.light_list;
     popup.config = { title: 'Lumières', icon: 'mdi:lightbulb-group' };

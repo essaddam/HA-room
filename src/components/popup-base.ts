@@ -1,13 +1,12 @@
 import { LitElement, html, css, TemplateResult } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { property } from 'lit/decorators.js';
 import { HomeAssistant } from 'custom-card-helpers';
 
-interface PopupConfig {
+export interface PopupConfig {
   icon?: string;
   title?: string;
 }
 
-@customElement('popup-base')
 export class PopupBase extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
   @property({ attribute: false }) public config: PopupConfig = {};
@@ -15,70 +14,86 @@ export class PopupBase extends LitElement {
   static get styles() {
     return css`
       :host {
-        display: block;
         position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.8);
+        inset: 0;
         z-index: 1000;
         display: flex;
         align-items: center;
         justify-content: center;
-        animation: fadeIn 0.3s ease;
+        padding: 16px;
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        animation: fadeIn 0.2s ease;
+      }
+
+      .popup-backdrop {
+        position: absolute;
+        inset: 0;
       }
 
       .popup-content {
-        background: var(--card-background-color, white);
+        position: relative;
+        background: var(--card-background-color, #ffffff);
+        color: var(--primary-text-color, #212121);
         border-radius: 20px;
-        max-width: 90vw;
-        max-height: 90vh;
-        width: 600px;
-        max-width: 600px;
+        width: 100%;
+        max-width: 560px;
+        max-height: calc(100vh - 32px);
         overflow: hidden;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        animation: slideUp 0.3s ease;
+        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.28);
+        animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        display: flex;
+        flex-direction: column;
       }
 
       .popup-header {
         display: flex;
         align-items: center;
-        padding: 20px;
-        border-bottom: 1px solid var(--divider-color);
-        background: var(--primary-color);
-        color: white;
-      }
-
-      .popup-title {
-        font-size: 18px;
-        font-weight: 600;
-        flex: 1;
+        gap: 12px;
+        padding: 20px 20px 12px;
+        border-bottom: 1px solid var(--divider-color, rgba(0,0,0,0.08));
       }
 
       .popup-icon {
-        font-size: 24px;
-        margin-right: 12px;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: var(--primary-color, #03a9f4);
+        color: var(--text-primary-color, #ffffff);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        flex-shrink: 0;
+      }
+
+      .popup-title {
+        flex: 1;
+        font-size: 18px;
+        font-weight: 700;
       }
 
       .close-button {
-        background: none;
-        border: none;
-        color: white;
-        font-size: 24px;
-        cursor: pointer;
-        padding: 8px;
+        width: 36px;
+        height: 36px;
         border-radius: 50%;
-        transition: background 0.2s ease;
+        border: none;
+        background: var(--secondary-background-color, rgba(0,0,0,0.05));
+        color: var(--primary-text-color, #212121);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.15s ease;
       }
 
       .close-button:hover {
-        background: rgba(255, 255, 255, 0.2);
+        background: var(--secondary-background-color, rgba(0,0,0,0.1));
       }
 
       .popup-body {
-        padding: 20px;
-        max-height: calc(90vh - 80px);
+        padding: 16px 20px 24px;
         overflow-y: auto;
       }
 
@@ -88,29 +103,36 @@ export class PopupBase extends LitElement {
       }
 
       @keyframes slideUp {
-        from { 
-          transform: translateY(50px);
+        from {
+          transform: translateY(30px) scale(0.96);
           opacity: 0;
         }
-        to { 
-          transform: translateY(0);
+        to {
+          transform: translateY(0) scale(1);
           opacity: 1;
         }
       }
 
-      @media (max-width: 768px) {
+      @media (max-width: 600px) {
+        :host {
+          padding: 0;
+          align-items: flex-end;
+        }
+
         .popup-content {
-          width: 95vw;
-          max-width: 95vw;
-          margin: 20px;
+          max-width: 100%;
+          max-height: 90vh;
+          border-radius: 20px 20px 0 0;
+          animation: slideUpMobile 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        
-        .popup-header {
-          padding: 16px;
+      }
+
+      @keyframes slideUpMobile {
+        from {
+          transform: translateY(100%);
         }
-        
-        .popup-body {
-          padding: 16px;
+        to {
+          transform: translateY(0);
         }
       }
     `;
@@ -118,11 +140,14 @@ export class PopupBase extends LitElement {
 
   protected render(): TemplateResult {
     return html`
-      <div class="popup-content">
+      <div class="popup-backdrop" @click=${this._closePopup}></div>
+      <div class="popup-content" role="dialog" aria-modal="true">
         <div class="popup-header">
-          <ha-icon class="popup-icon" icon=${this.config.icon || 'mdi:information'}></ha-icon>
+          <div class="popup-icon">
+            <ha-icon icon=${this.config.icon || 'mdi:information'}></ha-icon>
+          </div>
           <div class="popup-title">${this.config.title || 'Popup'}</div>
-          <button class="close-button" @click=${this._closePopup}>
+          <button class="close-button" @click=${this._closePopup} aria-label="Fermer">
             <ha-icon icon="mdi:close"></ha-icon>
           </button>
         </div>
@@ -147,5 +172,15 @@ export class PopupBase extends LitElement {
 
   public close(): void {
     this.remove();
+  }
+}
+
+if (!customElements.get('popup-base')) {
+  customElements.define('popup-base', PopupBase);
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'popup-base': PopupBase;
   }
 }

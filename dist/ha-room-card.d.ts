@@ -2,7 +2,6 @@ import { LitElement, TemplateResult } from 'lit';
 import { HomeAssistant, LovelaceCardEditor } from 'custom-card-helpers';
 import { HaRoomCardConfig, ChangedProperties } from './types.js';
 import './ha-room-card-editor.js';
-import './components/lights-popup.js';
 export declare class HaRoomCard extends LitElement {
     hass: HomeAssistant;
     config: HaRoomCardConfig;
