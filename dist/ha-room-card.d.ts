@@ -9,6 +9,7 @@ export declare class HaRoomCard extends LitElement {
     constructor();
     static get styles(): import("lit").CSSResult;
     setConfig(config: HaRoomCardConfig): void;
+    private _activePopups;
     protected willUpdate(changedProperties: ChangedProperties): void;
     private _updateRoomData;
     static isValidNavigationPath(path: string): boolean;
@@ -24,8 +25,6 @@ export declare class HaRoomCard extends LitElement {
     private _renderOpenChip;
     private _openPresencePopup;
     private _openOpeningsPopup;
-    private _renderControlButton;
-    private _handleButtonAction;
     private _renderLightsButton;
     private _openLightsPopup;
     private _renderPlugsButton;
@@ -34,6 +33,9 @@ export declare class HaRoomCard extends LitElement {
     private _renderAudioButton;
     private _renderVideoButton;
     private _renderCamerasButton;
+    private _openCoversPopup;
+    private _openMediaPopup;
+    private _openCamerasPopup;
     private _hasFeature;
     private _shouldHideEmptySections;
     private _hasVisibleChips;

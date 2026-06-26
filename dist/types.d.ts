@@ -29,6 +29,8 @@ export interface HaRoomCardConfig extends LovelaceCard {
     light_list?: string[];
     presence_list?: string[];
     open_list?: string[];
+    cover_list?: string[];
+    camera_list?: string[];
     lights_hash?: string;
     plugs_hash?: string;
     covers_hash?: string;

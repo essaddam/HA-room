@@ -19,6 +19,9 @@ import { LightsPopup } from './components/lights-popup.js';
 import { PlugsPopup } from './components/plugs-popup.js';
 import { PresencePopup } from './components/presence-popup.js';
 import { OpeningsPopup } from './components/openings-popup.js';
+import { CoversPopup } from './components/covers-popup.js';
+import { MediaPopup } from './components/media-popup.js';
+import { CamerasPopup } from './components/cameras-popup.js';
 
 
 console.info(
@@ -331,10 +334,19 @@ export class HaRoomCard extends LitElement {
     this.requestUpdate();
   }
 
+  private _activePopups: Set<HTMLElement> = new Set();
+
   protected willUpdate(changedProperties: ChangedProperties): void {
     // Only update room data if hass or config has changed
     if (changedProperties.has('hass') || changedProperties.has('config')) {
       this._updateRoomData();
+    }
+
+    // Keep open popups in sync with latest hass state
+    if (changedProperties.has('hass') && this.hass) {
+      this._activePopups.forEach((popup) => {
+        (popup as any).hass = this.hass;
+      });
     }
   }
 
@@ -654,6 +666,8 @@ export class HaRoomCard extends LitElement {
     popup.hass = this.hass;
     popup.entities = this.config.presence_list;
     popup.config = { title: 'Présence', icon: 'mdi:motion-sensor' };
+    popup.addEventListener('popup-closed', () => this._activePopups.delete(popup));
+    this._activePopups.add(popup);
     popup.open();
   }
 
@@ -664,39 +678,9 @@ export class HaRoomCard extends LitElement {
     popup.hass = this.hass;
     popup.entities = this.config.open_list;
     popup.config = { title: 'Ouvrants', icon: 'mdi:door-open' };
+    popup.addEventListener('popup-closed', () => this._activePopups.delete(popup));
+    this._activePopups.add(popup);
     popup.open();
-  }
-
-  private _renderControlButton(
-    title: string,
-    subtitle: string,
-    icon: string,
-    action: CardAction,
-    type: 'primary' | 'secondary' | 'tertiary' = 'primary',
-    coverImage?: string
-  ): TemplateResult {
-    return html`
-      <div 
-        class="control-button ${type}"
-        @click=${(ev: Event) => {
-          ev.stopImmediatePropagation();
-          ev.stopPropagation();
-          ev.preventDefault();
-          this._handleButtonAction(action);
-        }}
-      >
-        ${coverImage
-        ? html`<img class="media-cover" src="${coverImage}" alt="${title}">`
-        : html`<ha-icon class="button-icon" icon=${icon}></ha-icon>`
-      }
-        <div class="button-title">${title}</div>
-        <div class="button-subtitle">${subtitle}</div>
-      </div>
-    `;
-  }
-
-  private _handleButtonAction(action: CardAction): void {
-    this._executeAction(action, 'button');
   }
 
   private _renderLightsButton(): TemplateResult {
@@ -731,6 +715,8 @@ export class HaRoomCard extends LitElement {
     popup.hass = this.hass;
     popup.lights = this.config.light_list;
     popup.config = { title: 'Lumières', icon: 'mdi:lightbulb-group' };
+    popup.addEventListener('popup-closed', () => this._activePopups.delete(popup));
+    this._activePopups.add(popup);
     popup.open();
   }
 
@@ -766,17 +752,27 @@ export class HaRoomCard extends LitElement {
     popup.entities = this.config.power_list || [];
     popup.power_list = this.config.power_list || [];
     popup.config = { title: 'Prises', icon: 'mdi:power-socket-fr' };
+    popup.addEventListener('popup-closed', () => this._activePopups.delete(popup));
+    this._activePopups.add(popup);
     popup.open();
   }
 
   private _renderCoversButton(): TemplateResult {
-    return this._renderControlButton(
-      this.config.covers_label || 'Volets',
-      'Contrôler',
-      'mdi:blinds',
-      { action: 'navigate', navigation_path: this.config.covers_hash },
-      'tertiary'
-    );
+    return html`
+      <div
+        class="control-button tertiary"
+        @click=${(ev: Event) => {
+          ev.stopImmediatePropagation();
+          ev.stopPropagation();
+          ev.preventDefault();
+          this._openCoversPopup();
+        }}
+      >
+        <ha-icon class="button-icon" icon="mdi:blinds"></ha-icon>
+        <div class="button-title">${this.config.covers_label || 'Volets'}</div>
+        <div class="button-subtitle">Contrôler</div>
+      </div>
+    `;
   }
 
   private _renderAudioButton(): TemplateResult {
@@ -794,14 +790,24 @@ export class HaRoomCard extends LitElement {
       }
     }
 
-    return this._renderControlButton(
-      'Audio',
-      subtitle,
-      'mdi:speaker',
-      { action: 'navigate', navigation_path: this.config.audio_hash },
-      'primary',
-      coverImage
-    );
+    return html`
+      <div
+        class="control-button primary"
+        @click=${(ev: Event) => {
+          ev.stopImmediatePropagation();
+          ev.stopPropagation();
+          ev.preventDefault();
+          this._openMediaPopup('audio');
+        }}
+      >
+        ${coverImage
+          ? html`<img class="media-cover" src="${coverImage}" alt="Audio">`
+          : html`<ha-icon class="button-icon" icon="mdi:speaker"></ha-icon>`
+        }
+        <div class="button-title">Audio</div>
+        <div class="button-subtitle">${subtitle}</div>
+      </div>
+    `;
   }
 
   private _renderVideoButton(): TemplateResult {
@@ -819,24 +825,99 @@ export class HaRoomCard extends LitElement {
       }
     }
 
-    return this._renderControlButton(
-      'Vidéo',
-      subtitle,
-      'mdi:television',
-      { action: 'navigate', navigation_path: this.config.video_hash },
-      'secondary',
-      coverImage
-    );
+    return html`
+      <div
+        class="control-button secondary"
+        @click=${(ev: Event) => {
+          ev.stopImmediatePropagation();
+          ev.stopPropagation();
+          ev.preventDefault();
+          this._openMediaPopup('video');
+        }}
+      >
+        ${coverImage
+          ? html`<img class="media-cover" src="${coverImage}" alt="Vidéo">`
+          : html`<ha-icon class="button-icon" icon="mdi:television"></ha-icon>`
+        }
+        <div class="button-title">Vidéo</div>
+        <div class="button-subtitle">${subtitle}</div>
+      </div>
+    `;
   }
 
   private _renderCamerasButton(): TemplateResult {
-    return this._renderControlButton(
-      'Caméras',
-      'Live',
-      'mdi:cctv',
-      { action: 'navigate', navigation_path: this.config.cameras_hash },
-      'tertiary'
-    );
+    return html`
+      <div
+        class="control-button tertiary"
+        @click=${(ev: Event) => {
+          ev.stopImmediatePropagation();
+          ev.stopPropagation();
+          ev.preventDefault();
+          this._openCamerasPopup();
+        }}
+      >
+        <ha-icon class="button-icon" icon="mdi:cctv"></ha-icon>
+        <div class="button-title">Caméras</div>
+        <div class="button-subtitle">Live</div>
+      </div>
+    `;
+  }
+
+  private _openCoversPopup(): void {
+    if (!this.hass) return;
+
+    const covers = this.config.cover_list?.length
+      ? this.config.cover_list
+      : Object.keys(this.hass.states).filter(id => id.startsWith('cover.'));
+
+    if (!covers.length) return;
+
+    const popup = new CoversPopup();
+    popup.hass = this.hass;
+    popup.entities = covers;
+    popup.config = { title: this.config.covers_label || 'Volets', icon: 'mdi:blinds' };
+    popup.addEventListener('popup-closed', () => this._activePopups.delete(popup));
+    this._activePopups.add(popup);
+    popup.open();
+  }
+
+  private _openMediaPopup(type: 'audio' | 'video'): void {
+    if (!this.hass) return;
+
+    const entityId = type === 'audio'
+      ? this.config.audio_cover_entity
+      : this.config.video_cover_entity;
+
+    if (!entityId) return;
+
+    const popup = new MediaPopup();
+    popup.hass = this.hass;
+    popup.entityId = entityId;
+    popup.config = {
+      title: type === 'audio' ? 'Audio' : 'Vidéo',
+      icon: type === 'audio' ? 'mdi:speaker' : 'mdi:television'
+    };
+    popup.addEventListener('popup-closed', () => this._activePopups.delete(popup));
+    this._activePopups.add(popup);
+    popup.open();
+  }
+
+  private _openCamerasPopup(): void {
+    if (!this.hass) return;
+
+    const cameras = this.config.camera_list?.length
+      ? this.config.camera_list
+      : Object.keys(this.hass.states).filter(id => id.startsWith('camera.'));
+
+    if (!cameras.length) return;
+
+    const popup = new CamerasPopup();
+    popup.hass = this.hass;
+    popup.entities = cameras;
+    popup.config = { title: 'Caméras', icon: 'mdi:cctv' };
+    popup.addEventListener('popup-closed', () => this._activePopups.delete(popup));
+    this._activePopups.add(popup);
+    popup.open();
   }
 
   private _hasFeature(feature: string): boolean {

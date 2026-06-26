@@ -161,7 +161,7 @@ export class PopupBase extends LitElement {
   }
 
   private _closePopup(): void {
-    this.remove();
+    this.close();
   }
 
   public open(): void {
@@ -169,6 +169,7 @@ export class PopupBase extends LitElement {
   }
 
   public close(): void {
+    this.dispatchEvent(new CustomEvent('popup-closed', { bubbles: true, composed: true }));
     this.remove();
   }
 }
