@@ -1,4 +1,4 @@
-export declare const CARD_VERSION = "1.47.14";
+export declare const CARD_VERSION = "1.47.15";
 export declare const CARD_NAME = "ha-room-card";
 export declare const CARD_ELEMENT_NAME = "ha-room-card";
 export declare const CARD_FULL_NAME = "custom:ha-room-card";
